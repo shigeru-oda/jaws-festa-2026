@@ -1,0 +1,17 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# 検証で再生成されるもの
+work/
+out/*.html
+
+# marimo のセッションキャッシュ
+notebooks/__marimo__/
