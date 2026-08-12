@@ -1,0 +1,105 @@
+{
+  "dataset": "秋田県 人口移動理由実態調査 (CC BY 4.0)",
+  "versions": {
+    "2013-2018_cols": 19,
+    "2019-2025_cols": 16
+  },
+  "athena_style_positional_read": {
+    "columns_returning_other_item": 7,
+    "columns_null_padded": 3,
+    "sample_row": "2019年度・県外転入・男女計・総数",
+    "mislabeled_in_sample_row": {
+      "転業・転職": {
+        "reported": 1017,
+        "value_actually_belongs_to": "転職・就職（人）",
+        "true_value_of_this_name": null
+      },
+      "就職": {
+        "reported": 384,
+        "value_actually_belongs_to": "就職（学生）（人）",
+        "true_value_of_this_name": null
+      },
+      "家業後継": {
+        "reported": 295,
+        "value_actually_belongs_to": "学業（人）",
+        "true_value_of_this_name": null
+      },
+      "進学・転校": {
+        "reported": 390,
+        "value_actually_belongs_to": "結婚・離婚（人）",
+        "true_value_of_this_name": null
+      },
+      "卒業": {
+        "reported": 926,
+        "value_actually_belongs_to": "退職・同居（人）",
+        "true_value_of_this_name": null
+      },
+      "結婚・離婚": {
+        "reported": 117,
+        "value_actually_belongs_to": "住宅事情（人）",
+        "true_value_of_this_name": 390
+      },
+      "親との同居": {
+        "reported": 520,
+        "value_actually_belongs_to": "その他（人）",
+        "true_value_of_this_name": null
+      }
+    },
+    "sanity_check_total_equals_sum": {
+      "2013-2018": {
+        "rows": 702,
+        "passed": 702
+      },
+      "2019-2025": {
+        "rows": 819,
+        "passed": 819
+      }
+    }
+  },
+  "iceberg": {
+    "columns_after_v1": 19,
+    "columns_after_union_by_name": 28,
+    "rows": 1521,
+    "snapshots": 2,
+    "data_files": 2,
+    "total_kb": 39.0,
+    "full_scan_ms_min": 3.5
+  },
+  "plain_csv": {
+    "files": 2,
+    "total_kb": 143.5,
+    "full_scan_ms_min": 0.9
+  },
+  "cross_era_query": {
+    "years": [
+      "2013",
+      "2014",
+      "2015",
+      "2016",
+      "2017",
+      "2018",
+      "2019",
+      "2020",
+      "2021",
+      "2022",
+      "2023",
+      "2024",
+      "2025"
+    ],
+    "respondent_total_by_year": {
+      "2013": 5449,
+      "2014": 5194,
+      "2015": 4676,
+      "2016": 4290,
+      "2017": 4347,
+      "2018": 4481,
+      "2019": 6413,
+      "2020": 5406,
+      "2021": 5104,
+      "2022": 4663,
+      "2023": 4207,
+      "2024": 4043,
+      "2025": 4705
+    }
+  }
+}

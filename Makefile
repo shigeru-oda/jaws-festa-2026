@@ -9,8 +9,8 @@ help: ## このヘルプを表示する
 sync: ## 依存を入れる
 	uv sync
 
-notebooks: ## 3本のノートブックをスクリプトとして通し、out/ を再生成する
-	@for nb in akita_iceberg prefecture_schemas athena_vs_s3tables; do \
+notebooks: ## ノートブックをスクリプトとして通し、out/ を再生成する
+	@for nb in akita_iceberg athena_vs_s3tables; do \
 		printf '%-22s' "$$nb"; \
 		if $(UV) python notebooks/$$nb.py > /tmp/nb_$$nb.log 2>&1; then \
 			echo "OK"; \
@@ -18,6 +18,16 @@ notebooks: ## 3本のノートブックをスクリプトとして通し、out/ 
 			echo "FAIL"; tail -20 /tmp/nb_$$nb.log; exit 1; \
 		fi; \
 	done
+	@printf '%-22s' "prefecture_schemas"; \
+	if ls data/prefectures/*_population.csv > /dev/null 2>&1; then \
+		if $(UV) python notebooks/prefecture_schemas.py > /tmp/nb_pref.log 2>&1; then \
+			echo "OK"; \
+		else \
+			echo "FAIL"; tail -20 /tmp/nb_pref.log; exit 1; \
+		fi; \
+	else \
+		echo "SKIP (data/prefectures/ は再配布しないため未同梱。out/prefecture_comparison.json は既存の実測値を使う)"; \
+	fi
 
 check: ## 登壇原稿の数字が out/*.json と一致しているか検査する
 	$(UV) python scripts/retime_talk_script.py --check

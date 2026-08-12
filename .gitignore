@@ -15,3 +15,7 @@ out/*.html
 
 # marimo のセッションキャッシュ
 notebooks/__marimo__/
+
+# 他県のデータは再配布しない(ライセンスが県ごとに異なるため)。
+# 集計結果は out/prefecture_comparison.json にコミットしてある。
+data/prefectures/

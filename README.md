@@ -28,7 +28,7 @@ CSV 直読みのほうが速く、コンパクションの出番もない。
 
 ```sh
 uv sync
-make verify     # 3本のノートブックを通してから、登壇原稿の数字と突き合わせる
+make verify     # ノートブックを通してから、登壇原稿の数字と突き合わせる
 make tf-check   # Terraform の整形チェックと検証(AWS 認証情報は不要)
 make edit       # marimo で対話的に触る (NB=akita_iceberg などで指定)
 make help       # 他のターゲット
@@ -53,7 +53,7 @@ make help       # 他のターゲット
 | `out/*.png` | スライド用の図 |
 | `data/akita/` | 秋田県ポータルの CSV 19本 + XLSX 1本 |
 | `data/akita_idouriyuu/` | 人口移動理由実態調査 CSV 6本 |
-| `data/prefectures/` | 他県の市町村別人口 CSV 19本 + `_survey.json`(39県の調査記録) |
+| `data/prefectures/` | 他県の市町村別人口 CSV。**ライセンスが県ごとに異なるため追跡しない**(下記) |
 | `data/jawsug/` | JAWS-UG 支部一覧(43支部 / 39都道府県) |
 
 ## 実測値の一次情報
@@ -100,9 +100,15 @@ catalog = load_catalog("s3tables", **{
 秋田県オープンデータポータルサイト(<https://opendata.pref.akita.lg.jp/>)を加工して作成。
 ライセンス: CC BY 4.0(<https://creativecommons.org/licenses/by/4.0/deed.ja>)
 
-他都道府県のデータは各県のポータルから取得。**ライセンスは県ごとに異なる**
-(CC BY 4.0 / CC BY 2.1 日本 / Public Data License 1.0 / 政府標準利用規約系)。
-県ごとの出典 URL とライセンスは `data/prefectures/_survey.json` に記録している。
+他都道府県のデータは各県のポータルから取得したが、**ライセンスが県ごとに異なる**ため
+(CC BY 4.0 / CC BY 2.1 日本 / Public Data License 1.0 / 政府標準利用規約系)、
+再配布の可否を県ごとに確認できていない。**このリポジトリでは追跡していない**
+(`data/prefectures/` は `.gitignore`)。
+
+集計結果は `out/prefecture_comparison.json` にコミットしてあるので、全国比較の数値と
+19ファイルのヘッダは clone しただけで参照できる。データを取り直して
+`notebooks/prefecture_schemas.py` を再実行したい場合は、各県のポータルから
+自分でダウンロードする(`make verify` はデータが無ければ SKIP と表示する)。
 
 JAWS-UG 支部一覧は <https://jaws-ug.jp/act/> より取得。
 

@@ -100,7 +100,7 @@
     "snapshots": 2,
     "data_files": 2,
     "total_kb": 12.4,
-    "full_scan_ms_min": 2.3,
+    "full_scan_ms_min": 2.4,
     "full_scan_ms_avg": 2.5
   }
 }
