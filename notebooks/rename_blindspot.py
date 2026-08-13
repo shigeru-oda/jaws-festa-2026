@@ -24,7 +24,7 @@ auto_detect=false)` で模擬する。
 
 import marimo
 
-__generated_with = "0.17"
+__generated_with = "0.23.16"
 app = marimo.App(width="medium")
 
 
@@ -74,7 +74,7 @@ def _():
 
     H_OLD, H_NEW = header_of(F_OLD), header_of(F_NEW)
     con = duckdb.connect()
-    return DATA, F_NEW, F_OLD, H_NEW, H_OLD, OUT, ROOT, con, csv, header_of
+    return F_NEW, F_OLD, H_NEW, H_OLD, OUT, con
 
 
 @app.cell
@@ -153,7 +153,7 @@ def _(F_NEW, F_OLD, H_NEW, H_OLD, con, mo):
         結果は **{hive_rows} 行。エラーも警告もない。**
         """
     )
-    return COLS, LABEL_NEW, LABEL_OLD, hive_read, hive_rows
+    return COLS, LABEL_NEW, LABEL_OLD, hive_rows
 
 
 @app.cell
@@ -180,7 +180,7 @@ def _(LABEL_NEW, LABEL_OLD, mo):
         つまり 2020 年版の時点で **`c20` のラベルは実態と矛盾していた**。
         """
     )
-    return (FOCUS,)
+    return
 
 
 @app.cell
@@ -287,35 +287,33 @@ def _(con, mo):
 
 @app.cell
 def _(mo):
-    mo.md(
-        """
-        ## なぜ気づけないのか
+    mo.md("""
+    ## なぜ気づけないのか
 
-        「Athena が位置で読むから名前の変化を無視する」よりも根本的な理由がある。
+    「Athena が位置で読むから名前の変化を無視する」よりも根本的な理由がある。
 
-        **ヘッダ行はクエリに入っていない。** CSV テーブルは
-        `skip.header.line.count=1` でヘッダ行を捨てるので、列名という文字列は
-        S3 上のファイルに書かれているだけで、処理系には一度も渡らない。
-        県が訂正情報をファイルの1行目に書いても、その行は捨てられる。
+    **ヘッダ行はクエリに入っていない。** CSV テーブルは
+    `skip.header.line.count=1` でヘッダ行を捨てるので、列名という文字列は
+    S3 上のファイルに書かれているだけで、処理系には一度も渡らない。
+    県が訂正情報をファイルの1行目に書いても、その行は捨てられる。
 
-        さらに、この変更は
+    さらに、この変更は
 
-        - 列の位置が同じ
-        - 値の意味も同じ(`c20` は両年とも合計)
-        - 行数も型も同じ
+    - 列の位置が同じ
+    - 値の意味も同じ(`c20` は両年とも合計)
+    - 行数も型も同じ
 
-        なので、**Athena 側に検出可能な変化が物理的に存在しない**。
-        実装の不備ではなく、構造上そうなる。
+    なので、**Athena 側に検出可能な変化が物理的に存在しない**。
+    実装の不備ではなく、構造上そうなる。
 
-        気づけるのは**テーブル定義を作り直したとき**だけ。Glue Crawler を再実行すれば
-        列名は更新されるが、それは人間が能動的にやる操作で、データ側からは通知されない。
+    気づけるのは**テーブル定義を作り直したとき**だけ。Glue Crawler を再実行すれば
+    列名は更新されるが、それは人間が能動的にやる操作で、データ側からは通知されない。
 
-        > 補足: 再クロールは今回のケースでは無害(意味が変わっていないため)。
-        > ただし**位置がずれる変更**(列の挿入・削除)だった場合、再クロールで
-        > 新しい列名を割り当てると旧ファイルの値が別の列に流れ込む。
-        > その実測は `notebooks/athena_vs_s3tables.py` にある(列削除で7列が誤り3列がNULL)。
-        """
-    )
+    > 補足: 再クロールは今回のケースでは無害(意味が変わっていないため)。
+    > ただし**位置がずれる変更**(列の挿入・削除)だった場合、再クロールで
+    > 新しい列名を割り当てると旧ファイルの値が別の列に流れ込む。
+    > その実測は `notebooks/athena_vs_s3tables.py` にある(列削除で7列が誤り3列がNULL)。
+    """)
     return
 
 
@@ -357,7 +355,7 @@ def _(OUT, mo, overstate):
     )
 
     mo.md("図を `out/rename_overstate.png` に書き出した。")
-    return alt, chart_overstate, pl
+    return
 
 
 @app.cell
@@ -427,7 +425,7 @@ def _(
     print(json.dumps(summary["columns"], ensure_ascii=False, indent=2)[:400])
     print(json.dumps(summary["semantics_unchanged"], ensure_ascii=False, indent=2))
     print(json.dumps(summary["overstatement"], ensure_ascii=False, indent=2))
-    return json, summary
+    return
 
 
 if __name__ == "__main__":

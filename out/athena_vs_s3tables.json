@@ -63,12 +63,12 @@
     "snapshots": 2,
     "data_files": 2,
     "total_kb": 39.0,
-    "full_scan_ms_min": 3.5
+    "full_scan_ms_min": 4.4
   },
   "plain_csv": {
     "files": 2,
     "total_kb": 143.5,
-    "full_scan_ms_min": 0.9
+    "full_scan_ms_min": 1.1
   },
   "cross_era_query": {
     "years": [
