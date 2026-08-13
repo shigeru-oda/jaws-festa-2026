@@ -41,7 +41,8 @@ make help       # 他のターゲット
 
 | パス | 内容 |
 | --- | --- |
-| `notebooks/athena_vs_s3tables.py` | **本題**: 素の S3+Athena 構成と Iceberg の比較 |
+| `notebooks/rename_blindspot.py` | **本題**: 列名のリネームに気づけないことの再現 |
+| `notebooks/athena_vs_s3tables.py` | 列削除で値がずれることの再現(壊れ方その2) |
 | `notebooks/akita_iceberg.py` | 秋田県のデータでスキーマ進化・タイムトラベルを確認 |
 | `notebooks/prefecture_schemas.py` | JAWS-UG 支部がある 39 都道府県のスキーマ横断比較 |
 | `docs/talk-script.md` | 15分の登壇スクリプト(構成・話す原稿・セルフチェック) |
@@ -60,11 +61,12 @@ make help       # 他のターゲット
 
 | ファイル | 主な内容 |
 | --- | --- |
+| `out/rename_blindspot.json` | リネームの内訳 / 意味が不変であることの検算 / 過大率 |
 | `out/athena_vs_s3tables.json` | 誤読の内訳 / 検算の通過率 / Iceberg の列数・snapshot / 規模と速度 |
 | `out/summary.json` | 秋田の人口推移・高齢化率・スキーマ進化の差分 |
 | `out/prefecture_comparison.json` | 39県調査の集計 + 19ファイルのヘッダ全文 |
 
-図は `out/athena_misread.png`(誤読)、`out/idouriyuu_reasons.png`(理由別推移)、
+図は `out/rename_overstate.png`(リネームによる過大)、`out/athena_misread.png`(誤読)、`out/idouriyuu_reasons.png`(理由別推移)、
 `out/population_trend.png` / `population_change.png` / `aging_ratio.png`(秋田の人口)、
 `out/pref_columns.png` / `pref_platforms.png`(全国比較)。
 
