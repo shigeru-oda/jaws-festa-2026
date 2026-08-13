@@ -78,6 +78,7 @@ def main() -> int:
     ice = load("athena_vs_s3tables.json")
     summ = load("summary.json")
     pref = load("prefecture_comparison.json")
+    ren = load("rename_blindspot.json")
 
     body, spoken, headers = split_script()
 
@@ -89,30 +90,60 @@ def main() -> int:
     nagasaki = next(x["header_row"] for x in pref["header_not_first_row"] if x["pref"] == "長崎県")
 
     # (説明, 値, 本文に出現すべき正規表現。{v} が値に置き換わる)
+    #
+    # 第1段(リネーム / out/rename_blindspot.json)と
+    # 第2段(列削除 / out/athena_vs_s3tables.json)の両方を検査する。
+    ren_over = {(o["era"], o["area"]): o for o in ren["overstatement"]}
     required: list[tuple[str, float | int, str]] = [
+        # 導入
         ("1980年の人口", summ["population"]["first"], r"{v}"),
         ("2025年の人口", summ["population"]["last"], r"{v}"),
-        ("人口の減少率", abs(summ["population"]["pct"]), r"{v}|マイナス30パーセント"),
+        ("人口の減少率", abs(summ["population"]["pct"]), r"{v}|30パーセント"),
+        # 第1段: リネーム
+        ("月報人口の列数", ren["columns"]["count_before"], r"{v}列"),
+        ("改称された列数", ren["columns"]["renamed"], r"{v}列"),
+        (
+            "挿入・削除・並べ替えの件数",
+            ren["columns"]["inserted_or_deleted_or_reordered"],
+            r"{v}件|1件もありません",
+        ),
+        ("読めた行数", ren["hive_style_read"]["rows_read"], r"{v}行"),
+        ("意味不変の検算行数", ren["semantics_unchanged"]["by_era"]["2020年版"]["passed"], r"{v}行"),
+        ("市部計の誤った値", ren_over[("2020", "市部計")]["believed_kengai"], r"{v}人"),
+        ("市部計の実際の県外", ren_over[("2020", "市部計")]["actual_kengai"], r"{v}人"),
+        (
+            "市部計の過大率",
+            round(ren_over[("2020", "市部計")]["overstated_pct"]),
+            r"{v}パーセント|{v}%",
+        ),
+        ("郡部計の誤った値", ren_over[("2020", "郡部計")]["believed_kengai"], r"{v}人"),
+        ("郡部計の実際の県外", ren_over[("2020", "郡部計")]["actual_kengai"], r"{v}人"),
+        (
+            "郡部計の過大率",
+            round(ren_over[("2020", "郡部計")]["overstated_pct"]),
+            r"{v}パーセント|{v}%",
+        ),
+        # 第2段: 列削除
         ("旧版の列数", ice["versions"]["2013-2018_cols"], r"{v}列"),
         ("新版の列数", ice["versions"]["2019-2025_cols"], r"{v}列"),
-        ("全体の行数", ice["iceberg"]["rows"], r"{v}行|\*\*{v}\*\*"),
         ("結婚・離婚の報告値", mis["結婚・離婚"]["reported"], r"{v}"),
         ("結婚・離婚の真値", mis["結婚・離婚"]["true_value_of_this_name"], r"{v}"),
         ("家業後継の報告値", mis["家業後継"]["reported"], r"{v}"),
-        ("別項目を返す列数", pos["columns_returning_other_item"], r"{v}つの項目|{v}列"),
-        ("NULL埋めの列数", pos["columns_null_padded"], r"{v}つの項目|{v}列"),
-        ("旧版の検算行数", sanity["2013-2018"]["rows"], r"{v}"),
-        ("新版の検算行数", sanity["2019-2025"]["rows"], r"{v}"),
+        ("別項目を返す列数", pos["columns_returning_other_item"], r"{v}項目|{v}列"),
+        ("NULL埋めの列数", pos["columns_null_padded"], r"{v}項目|{v}列"),
+        ("検算した全行数", ice["iceberg"]["rows"], r"{v}行"),
+        # Iceberg 側
         ("union_by_name 後の列数", ice["iceberg"]["columns_after_union_by_name"], r"{v}列|から{v}"),
         ("2018年の回答総数", totals["2018"], r"{v}"),
         ("2019年の回答総数", totals["2019"], r"{v}"),
         ("回答総数の増加率", jump, r"{v}|43パーセント"),
+        # 規模
         ("CSV の実サイズKB", ice["plain_csv"]["total_kb"], r"{v} ?KB"),
         ("Iceberg の実サイズKB", ice["iceberg"]["total_kb"], r"{v} ?KB"),
+        # 全国比較(Q&A用)
         ("調査ファイル数", pref["files"], r"{v}ファイル"),
-        ("Shift_JIS のファイル数", pref["encodings"]["Shift_JIS"], r"Shift_JIS {v}|{v}ファイルがShift_JIS"),
-        ("UTF-8 BOM のファイル数", pref["encodings"]["UTF-8 (BOM)"], r"BOM {v}"),
-        ("ヘッダが1行目にない県の数", len(pref["header_not_first_row"]), r"{v}件|{v}県"),
+        ("Shift_JIS のファイル数", pref["encodings"]["Shift_JIS"], r"{v}がShift_JIS|Shift_JIS {v}"),
+        ("ヘッダが1行目にない県の数", len(pref["header_not_first_row"]), r"{v}件"),
         ("長崎のヘッダ行", nagasaki, r"{v}行目"),
     ]
 
