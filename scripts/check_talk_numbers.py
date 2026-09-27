@@ -79,6 +79,7 @@ def main() -> int:
     summ = load("summary.json")
     pref = load("prefecture_comparison.json")
     ren = load("rename_blindspot.json")
+    now = load("akita_now.json")
 
     body, spoken, headers = split_script()
 
@@ -88,6 +89,12 @@ def main() -> int:
     totals = ice["cross_era_query"]["respondent_total_by_year"]
     jump = round(100 * (totals["2019"] / totals["2018"] - 1), 1)
     nagasaki = next(x["header_row"] for x in pref["header_not_first_row"] if x["pref"] == "長崎県")
+
+    # 冒頭と締めで出す「今の秋田」の数字(out/akita_now.json)
+    age_last = now["age"]["last"]
+    out_reasons = {d["reason"]: d for d in now["reasons"]["out"]["items"]}
+    in_reasons = {d["reason"]: d for d in now["reasons"]["in"]["items"]}
+    top_out = now["reasons"]["out"]["items"][0]
 
     # (説明, 値, 本文に出現すべき正規表現。{v} が値に置き換わる)
     #
@@ -99,6 +106,19 @@ def main() -> int:
         ("1980年の人口", summ["population"]["first"], r"{v}"),
         ("2025年の人口", summ["population"]["last"], r"{v}"),
         ("人口の減少率", abs(summ["population"]["pct"]), r"{v}|30パーセント"),
+        # 今の秋田(S2 で出して S11 で出し直す4つの数字)
+        ("ピークの人口", now["population"]["peak"], r"{v}"),
+        ("直近の月報人口", now["monthly_2026"]["last_population"], r"{v}"),
+        ("65歳以上の割合", age_last["over65_pct"], r"{v}パーセント|{v}%"),
+        ("75歳以上の人数", age_last["over75"], r"{v}人"),
+        ("15歳未満の割合", age_last["under15_pct"], r"{v}パーセント|{v}%"),
+        ("2025年の自然増減", abs(now["monthly_2025"]["natural"]), r"{v}人"),
+        ("2025年の社会増減", abs(now["monthly_2025"]["social"]), r"{v}人"),
+        ("自然減の割合", now["monthly_2025"]["natural_share_pct"], r"{v}パーセント|{v}%"),
+        ("県外転出の総数", now["reasons"]["out"]["total"], r"{v}人"),
+        ("転出理由1位の割合", round(top_out["pct"]), r"{v}パーセント|{v}%"),
+        ("転入の退職・同居", in_reasons["退職・同居"]["people"], r"{v}人"),
+        ("転出の退職・同居", out_reasons["退職・同居"]["people"], r"{v}人"),
         # 第1段: リネーム
         ("月報人口の列数", ren["columns"]["count_before"], r"{v}列"),
         ("改称された列数", ren["columns"]["renamed"], r"{v}列"),
