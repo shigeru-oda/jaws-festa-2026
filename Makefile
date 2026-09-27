@@ -10,7 +10,7 @@ sync: ## 依存を入れる
 	uv sync
 
 notebooks: ## ノートブックをスクリプトとして通し、out/ を再生成する
-	@for nb in akita_iceberg athena_vs_s3tables rename_blindspot; do \
+	@for nb in akita_iceberg athena_vs_s3tables rename_blindspot akita_now; do \
 		printf '%-22s' "$$nb"; \
 		if $(UV) python notebooks/$$nb.py > /tmp/nb_$$nb.log 2>&1; then \
 			echo "OK"; \

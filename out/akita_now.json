@@ -1,0 +1,137 @@
+{
+  "dataset": "秋田県 人口統計(年次推移 / 月報人口 / 年齢3区分 / 人口移動理由) / CC BY 4.0",
+  "population": {
+    "peak_label": "1981年10月1日現在",
+    "peak": 1257411,
+    "latest_label": "2025年10月1日現在",
+    "latest": 878798,
+    "lost_from_peak": 378613,
+    "pct_from_peak": -30.1
+  },
+  "monthly_2025": {
+    "months": 12,
+    "last_label": "2025年12月1日現在",
+    "last_population": 876671,
+    "natural": -13803,
+    "social": -3434,
+    "natural_share_pct": 80
+  },
+  "monthly_2026": {
+    "months": 7,
+    "last_label": "2026年7月1日現在",
+    "last_population": 864753,
+    "natural": -8068,
+    "social": -3850,
+    "natural_share_pct": 68
+  },
+  "age": {
+    "first": {
+      "label": "2006年10月1日現在",
+      "total": 1134036,
+      "under15_pct": 12.3,
+      "over65_pct": 27.5,
+      "over75": 154237
+    },
+    "last": {
+      "label": "2025年10月1日現在",
+      "total": 878798,
+      "under15_pct": 8.6,
+      "over65_pct": 40.1,
+      "over75": 201669
+    },
+    "points": 20
+  },
+  "reasons": {
+    "year": "2025年度",
+    "out": {
+      "total": 4705,
+      "items": [
+        {
+          "reason": "転職・就職",
+          "people": 1270,
+          "pct": 27.0
+        },
+        {
+          "reason": "転勤",
+          "people": 832,
+          "pct": 17.7
+        },
+        {
+          "reason": "その他",
+          "people": 791,
+          "pct": 16.8
+        },
+        {
+          "reason": "学業",
+          "people": 622,
+          "pct": 13.2
+        },
+        {
+          "reason": "就職（学生）",
+          "people": 603,
+          "pct": 12.8
+        },
+        {
+          "reason": "退職・同居",
+          "people": 242,
+          "pct": 5.1
+        },
+        {
+          "reason": "結婚・離婚",
+          "people": 180,
+          "pct": 3.8
+        },
+        {
+          "reason": "住宅事情",
+          "people": 165,
+          "pct": 3.5
+        }
+      ]
+    },
+    "in": {
+      "total": 4346,
+      "items": [
+        {
+          "reason": "転職・就職",
+          "people": 1010,
+          "pct": 23.2
+        },
+        {
+          "reason": "転勤",
+          "people": 859,
+          "pct": 19.8
+        },
+        {
+          "reason": "その他",
+          "people": 777,
+          "pct": 17.9
+        },
+        {
+          "reason": "退職・同居",
+          "people": 776,
+          "pct": 17.9
+        },
+        {
+          "reason": "就職（学生）",
+          "people": 279,
+          "pct": 6.4
+        },
+        {
+          "reason": "学業",
+          "people": 236,
+          "pct": 5.4
+        },
+        {
+          "reason": "結婚・離婚",
+          "people": 218,
+          "pct": 5.0
+        },
+        {
+          "reason": "住宅事情",
+          "people": 191,
+          "pct": 4.4
+        }
+      ]
+    }
+  }
+}
