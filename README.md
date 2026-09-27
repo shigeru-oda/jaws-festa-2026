@@ -48,6 +48,7 @@ make help       # 他のターゲット
 | `notebooks/prefecture_schemas.py` | JAWS-UG 支部がある 39 都道府県のスキーマ横断比較 |
 | `docs/talk-script.md` | 15分の登壇スクリプト(構成・話す原稿・セルフチェック) |
 | `docs/comparison.md` | 比較検証の詳細(表・図・判断軸・限界) |
+| `docs/akita-opendata.md` | 同梱データの台帳(出典・ライセンス・ファイル一覧・年をまたいだ形の変化) |
 | `terraform/` | AWS 上に2つの構成を作る(素の S3+Glue+Athena / S3 Tables)。[README](terraform/README.md) |
 | `scripts/check_talk_numbers.py` | 原稿の数字が実測値と一致しているかの検査 |
 | `scripts/retime_talk_script.py` | 原稿の尺(見出しの時刻・尺表)を文字数から再生成 |
