@@ -4,7 +4,7 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project   = "jaws-festa-2026-s3tables-demo"
+      Project   = "jaws-festa-2026"
       ManagedBy = "terraform"
       Purpose   = "conference-talk-verification"
     }
