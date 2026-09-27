@@ -5,12 +5,16 @@ JAWS FESTA 2026 in AKITA 登壇スライド。公式スライドテンプレー�
 
 | ファイル | 役割 |
 |---|---|
+| `main.md` | 本番スライド。`docs/talk-script.md` の15節を1枚ずつ起こしたもの（+ Q&A用の予備3枚） |
 | `template.md` | 素のひな形。元テンプレート5レイアウトのプレースホルダ文字のまま |
 | `deck.md` | レイアウト見本。全レイアウトにサンプル文字を入れたもの |
 | `themes/jaws-festa-2026.css` | 生成物。marp が読むテーマ |
 | `theme-src/jaws-festa-2026.src.css` | テーマの編集元。直すのはこちら |
 | `tools/build_theme.py` | src の画像参照を data URI に埋め込んで themes/ を生成する |
 | `assets/` | 元テンプレートから抽出した背景・ロゴ |
+
+`main.md` の各スライドには、原稿の「話す」をそのまま発表者ノート（HTMLコメント）として
+入れてある。`--pdf-notes` を付けて書き出すとPDFの注釈に入る。
 
 marp-cli と `tools/build_theme.py` はこのディレクトリを基準に動くので、コマンドは
 `slides/` に `cd` してから実行する。
