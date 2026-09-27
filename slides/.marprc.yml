@@ -1,0 +1,3 @@
+themeSet: ./themes
+allowLocalFiles: true
+pdfOutlines: true

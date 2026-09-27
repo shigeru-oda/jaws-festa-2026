@@ -1,0 +1,284 @@
+/* @theme jaws-festa-2026 */
+/*
+ * JAWS FESTA 2026 in AKITA 公式スライドテンプレート（Google スライド）の Marp 移植版。
+ * 背景・ロゴは配布された .pptx から抽出した画像をそのまま使用している。
+ *
+ * 元テンプレートは 1440x810px（= 720x405pt）。Marp は 1280x720px で組むため、
+ * 座標・文字サイズは 1280/1440 = 0.8889 倍している。pt からの換算は 1pt = 1.778px。
+ */
+
+@import 'default';
+@import url('https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=M+PLUS+Rounded+1c:wght@500&display=swap');
+
+section {
+  /* 元テンプレート由来の色。bar は本文レイアウト上端のライン(#74D4C1)、
+     mint は表紙・扉の地色、paper は本文の地色、ink/orange/red はロゴの色。 */
+  --festa-font: 'BIZ UDPGothic', 'BIZ UDPゴシック', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+  --festa-font-round: 'M PLUS Rounded 1c', var(--festa-font);
+  --festa-fg: #000000;
+  --festa-mint: #90ddcd;
+  --festa-paper: #f1fbf9;
+  --festa-bar: #74d4c1;
+  --festa-ink: #241815;
+  --festa-orange: #e89215;
+  --festa-red: #da392c;
+  --festa-rule: rgba(36, 24, 21, 0.28);
+  --festa-link: #0e6b5e;
+
+  --festa-title-size: 89px; /* 50pt */
+  --festa-subtitle-size: 46px; /* 26pt */
+  --festa-section-size: 64px; /* 36pt */
+  --festa-h1-size: 43px; /* 24pt */
+  --festa-body-size: 30px; /* 18pt=32px を少し詰めた */
+
+  width: 1280px;
+  height: 720px;
+  /* 元テンプレ本文: タイトル上端 y=68、本文上端 y=161、左右余白 44 */
+  padding: 68px 44px 76px;
+  position: relative;
+  font-family: var(--festa-font);
+  font-size: var(--festa-body-size);
+  color: var(--festa-fg);
+  background-color: var(--festa-paper);
+  /* 1枚目のレイヤが上端のライン(高さ10px)、2枚目が地の柄 */
+  background-image: linear-gradient(var(--festa-bar) 0 10px, rgba(0, 0, 0, 0) 10px),
+    url('../assets/bg-body.jpg');
+  background-repeat: no-repeat, no-repeat;
+  background-size: 100% 100%, cover;
+  background-position: top left, center;
+  /* marp の default テーマが `place-content: safe center center` を当てて本文を
+     上下中央に寄せてくる（Chrome は display:block でも align-content を解釈する）。
+     元テンプレは上端揃えなので align-content ごと上書きする。 */
+  align-content: start;
+  justify-content: flex-start;
+}
+
+/* ---- 右下のロゴ ----
+ * default テーマが section::before に clearfix (display: table) を当ててくるため、
+ * display: block と実寸を明示しないとボックスが潰れて描画されない。
+ * z-index は指定しない。負の値にすると section の背景より後ろに回って消える
+ * （section が独立したスタッキングコンテキストを作らないため）。代わりに本文側を
+ * z-index: 1 で持ち上げて、大きいエンブレムが文字を隠さないようにしている。 */
+section::before {
+  content: '';
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background-image: url('../assets/logo-horizontal.png');
+  background-repeat: no-repeat;
+  background-position: right 16px bottom 14px;
+  background-size: 171px auto;
+}
+
+section h1,
+section h2,
+section h3 {
+  font-family: var(--festa-font);
+  font-weight: 700;
+  color: inherit;
+  padding: 0;
+}
+
+/* ::before（ロゴ・エンブレム）は絶対配置なので既定では本文より前に描かれる。
+   本文側を持ち上げて、扉の大きいエンブレムが文字にかぶらないようにする。 */
+section h1,
+section h2,
+section h3,
+section p,
+section ul,
+section ol,
+section table,
+section pre,
+section blockquote,
+section img {
+  position: relative;
+  z-index: 1;
+}
+
+section h1 {
+  font-size: var(--festa-h1-size);
+  line-height: 1.2;
+  /* 68 + 52 + 41 = 161px。元テンプレの本文上端に合わせている */
+  margin: 0 0 41px;
+}
+
+section h2 {
+  font-size: 34px;
+  margin: 0 0 20px;
+}
+
+section h3 {
+  font-size: 30px;
+  margin: 0 0 16px;
+}
+
+section p,
+section ul,
+section ol {
+  font-size: var(--festa-body-size);
+  line-height: 1.6;
+  margin: 0 0 16px;
+}
+
+section li > ul,
+section li > ol {
+  margin: 4px 0 0;
+}
+
+section strong {
+  font-weight: 700;
+}
+
+section a {
+  color: var(--festa-link);
+}
+
+section code {
+  font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+section pre {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--festa-rule);
+  font-size: 24px;
+}
+
+section table {
+  font-size: 26px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+section table th {
+  background: rgba(116, 212, 193, 0.35);
+}
+
+section blockquote {
+  border-left: 6px solid var(--festa-bar);
+  color: var(--festa-ink);
+}
+
+/* ページ番号。元テンプレは扉のみ右下だが、本文では右下をロゴが占めるので左下に置く */
+section::after {
+  font-family: var(--festa-font);
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.5);
+  left: 44px;
+  right: auto;
+  bottom: 18px;
+  text-align: left;
+}
+
+/* ---- 表紙（元テンプレ 1 枚目 TITLE） ---- */
+section.title {
+  /* 下パディングで重心を上げ、タイトルの中心を元テンプレの y=315 付近に合わせる */
+  padding: 0 64px 120px;
+  align-content: center;
+  justify-content: center;
+  align-items: stretch;
+  text-align: center;
+  background-color: var(--festa-mint);
+  background-image: url('../assets/bg-cover.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+section.title h1 {
+  font-size: var(--festa-title-size);
+  line-height: 1.15;
+  text-wrap: balance;
+  margin: 0 0 40px;
+}
+
+section.title h2 {
+  font-size: var(--festa-subtitle-size);
+  font-weight: 500;
+  margin: 0 0 12px;
+}
+
+section.title p {
+  font-size: var(--festa-subtitle-size);
+  line-height: 1.3;
+  margin: 0;
+}
+
+/* エンブレムを右下に、固定のハッシュタグを下中央に置く（元テンプレと同じ位置） */
+section.title::before {
+  content: '#jawsug #jawsfesta2026';
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 24px;
+  font-family: var(--festa-font-round);
+  font-weight: 500;
+  font-size: 26px;
+  color: var(--festa-fg);
+  background-image: url('../assets/logo-emblem.png');
+  background-position: right 29px bottom 17px;
+  background-size: 199px auto;
+}
+
+section.title::after {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---- 扉（元テンプレ 2 枚目 SECTION_HEADER: 地色あり） ---- */
+section.section {
+  /* タイトル上端 y=229 */
+  padding: 229px 44px 76px;
+  background-color: var(--festa-mint);
+  background-image: url('../assets/bg-section.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+section.section h1 {
+  font-size: var(--festa-section-size);
+  line-height: 1.15;
+  max-width: 754px;
+  margin: 0;
+}
+
+section.section p {
+  max-width: 754px;
+  margin: 24px 0 0;
+}
+
+/* 大きいエンブレムを右に。元テンプレは x=736 から幅 539 で、タイトル枠と少し重なる */
+section.section::before {
+  background-image: url('../assets/logo-emblem.png');
+  background-position: right 4px top 212px;
+  background-size: 539px auto;
+}
+
+/* ---- 扉（元テンプレ 3 枚目 SECTION_HEADER_1: 地色なし） ---- */
+section.section.light {
+  background-color: var(--festa-paper);
+  background-image: url('../assets/bg-body.jpg');
+}
+
+/* ---- 本文・無地（元テンプレ 5 枚目 TITLE_AND_BODY_1: 地の柄なし） ---- */
+section.plain {
+  background-color: #ffffff;
+  background-image: linear-gradient(var(--festa-bar) 0 10px, rgba(0, 0, 0, 0) 10px);
+  background-size: 100% 100%;
+}
+
+/* ---- Marp 側の追加: 中央寄せの言い切りスライド ---- */
+section.lead {
+  align-content: center;
+  justify-content: center;
+  text-align: center;
+}
+
+section.lead h1 {
+  font-size: 60px;
+  margin: 0 0 24px;
+}
+
+section.lead p {
+  font-size: 36px;
+}
