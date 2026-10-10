@@ -6,7 +6,8 @@ JAWS FESTA 2026 in AKITA(2026-11-07)登壇
 [タイムテーブル](https://jawsfesta2026.jaws-ug.jp/timetable/4268f6be-274a-45f1-b5e3-ec5b56c0a0f7)
 
 登壇ではライブデモを行わない。ここで得た数値と図をスライドに載せる。
-ノートブックは marimo だが**保存形式は普通の `.py`** なので、差分が読めてそのまま実行できる。
+計測は AWS 上の Athena で行う(`terraform apply` → `make athena`)。
+手元のスクリプトは標準ライブラリだけで動く。
 
 ## 分かったこと
 
@@ -28,32 +29,34 @@ CSV 直読みのほうが速く、コンパクションの出番もない。
 ## 動かす
 
 ```sh
-uv sync
-make verify     # ノートブックを通してから、登壇原稿の数字と突き合わせる
+make check      # 登壇原稿の数字が out/*.json と一致しているか検査する(AWS 認証情報は不要)
 make tf-check   # Terraform の整形チェックと検証(AWS 認証情報は不要)
-make edit       # marimo で対話的に触る (NB=akita_iceberg などで指定)
+make athena     # AWS 上の保存クエリを実行して結果を取り直す(AWS 認証情報が必要)
 make help       # 他のターゲット
 ```
 
-`make verify` が通れば、`docs/talk-script.md` に書いた数字は `out/*.json` の実測値と
-一致している。数字がずれたらここで落ちる。
+`make check` が通れば、`docs/talk-script.md` に書いた数字は `out/*.json` の実測値と
+一致している。数字がずれたらここで落ちる。標準ライブラリだけで動くので `uv sync` は要らない。
+
+計測そのものは AWS 上で行う。`terraform apply` して `make athena` を回すと、Athena の
+保存クエリ12本の結果が `out/athena_drift_gen*.json` に落ちる。
 
 ## 構成
 
 | パス | 内容 |
 | --- | --- |
-| `notebooks/rename_blindspot.py` | **本題**: 列名のリネームに気づけないことの再現 |
-| `notebooks/athena_vs_s3tables.py` | 列削除で値がずれることの再現(壊れ方その2) |
-| `notebooks/akita_iceberg.py` | 秋田県のデータでスキーマ進化・タイムトラベルを確認 |
-| `notebooks/prefecture_schemas.py` | JAWS-UG 支部がある 39 都道府県のスキーマ横断比較 |
 | `docs/talk-script.md` | 15分の登壇スクリプト(構成・話す原稿・セルフチェック) |
 | `docs/comparison.md` | 比較検証の詳細(表・図・判断軸・限界) |
 | `docs/akita-opendata.md` | 同梱データの台帳(出典・ライセンス・ファイル一覧・年をまたいだ形の変化) |
-| `terraform/` | AWS 上に2つの構成を作る(素の S3+Glue+Athena / S3 Tables)。[README](terraform/README.md) |
+| `terraform/` | AWS 上に素の構成(S3 + Glue + Athena)を作る。[README](terraform/README.md) |
+| `terraform/later/` | S3 Tables の定義。段階的に足すため読み込み対象から外してある |
+| `scripts/run_athena_queries.py` | Athena の保存クエリを順に実行して `out/athena_*.json` に落とす |
+| `scripts/verify_drift.py` | Athena の読み方(位置読み・NULL 詰め)を手元で再現して期待値を出す |
+| `scripts/fetch_jinkousetai.sh` / `fetch_nenreikakusai.sh` | CKAN から CSV を取り直して列構成を検査する |
 | `scripts/check_talk_numbers.py` | 原稿の数字が実測値と一致しているかの検査 |
 | `scripts/retime_talk_script.py` | 原稿の尺(見出しの時刻・尺表)を文字数から再生成 |
-| `out/*.json` | **実測値の一次情報**。原稿や README の数字はここが根拠 |
-| `out/*.png` | スライド用の図 |
+| `out/*.json` | 実測値の一次情報。原稿や README の数字はここが根拠。再生成元を持たないのでコミット済みのものが正本 |
+| `out/*.png` | スライド用の図。同じく正本(`make clean` では消さない) |
 | `data/akita/` | 秋田県ポータルの CSV 19本 + XLSX 1本 |
 | `data/akita_idouriyuu/` | 人口移動理由実態調査 CSV 6本 |
 | `data/prefectures/` | 他県の市町村別人口 CSV。**ライセンスが県ごとに異なるため追跡しない**(下記) |
@@ -61,43 +64,39 @@ make help       # 他のターゲット
 
 ## 実測値の一次情報
 
-| ファイル | 主な内容 |
-| --- | --- |
-| `out/rename_blindspot.json` | リネームの内訳 / 意味が不変であることの検算 / 過大率 |
-| `out/athena_vs_s3tables.json` | 誤読の内訳 / 検算の通過率 / Iceberg の列数・snapshot / 規模と速度 |
-| `out/summary.json` | 秋田の人口推移・高齢化率・スキーマ進化の差分 |
-| `out/prefecture_comparison.json` | 39県調査の集計 + 19ファイルのヘッダ全文 |
+| ファイル | 主な内容 | 取り直し |
+| --- | --- | --- |
+| `out/athena_drift_gen1.json` / `gen2.json` | Athena 実機での参照先ドリフト(世代1 / 世代2) | `make athena` |
+| `out/drift_verification.json` | 同じ検証の手元での期待値 | `scripts/verify_drift.py` |
+| `out/rename_blindspot.json` | リネームの内訳 / 意味が不変であることの検算 / 過大率 | 不可(コミット済みが正本) |
+| `out/athena_vs_s3tables.json` | 誤読の内訳 / 検算の通過率 / Iceberg の列数・snapshot / 規模と速度 | 不可 |
+| `out/akita_now.json` / `summary.json` | 秋田の人口推移・高齢化率・移動理由の内訳 | 不可 |
+| `out/prefecture_comparison.json` | 39県調査の集計 + 19ファイルのヘッダ全文 | 不可(元データを追跡していない) |
 
-図は `out/rename_overstate.png`(リネームによる過大)、`out/athena_misread.png`(誤読)、`out/idouriyuu_reasons.png`(理由別推移)、
+「取り直し」が不可のものは、2026-10-04 に `notebooks/` を外した時点で再生成元が無くなった。
+コミット済みのファイルが唯一の正本で、`scripts/check_talk_numbers.py` はこれを読んで
+原稿の必須44件を検査する。生成コードは git 履歴に残っているので、必要になったら
+`git show 64c9f75:notebooks/<名前>.py` で取り出せる。
+
+図は `out/rename_overstate.png`(リネームによる過大)、`out/athena_misread.png`(誤読。デッキ243行目で使用)、`out/idouriyuu_reasons.png`(理由別推移)、
 `out/population_trend.png` / `population_change.png` / `aging_ratio.png`(秋田の人口)、
-`out/pref_columns.png` / `pref_platforms.png`(全国比較)。
+`out/pref_columns.png` / `pref_platforms.png`(全国比較)。いずれも同じく正本。
 
-## まだ確かめていないこと
+## 確かめたこと / まだ確かめていないこと
 
-- **S3 Tables 本体**(テーブルバケット・自動コンパクション・オブジェクト監視課金・IAM 認可)。
-  ローカルは PyIceberg + SQLite カタログで代替している
-- **Athena 実機**。列の位置読みは DuckDB で模擬している(`auto_detect=false` が要る)
-- **両構成のコスト**。試算も実測もまだ無い
+Athena 実機は 2026-10-04 に検証済み。`terraform apply` して保存クエリ12本を実行し、
+参照先が物理的にずれること(`age_unknown` が 8,540 → 25,345、最終列が全 NULL)を
+実データで確認した。結果は `out/athena_drift_gen1.json` / `gen2.json`。
 
-`terraform/` に**両構成を作る Terraform は書いてある**(`terraform validate` は通る)。
-`apply` していないので、上記はまだ実測できていない。手順は
+まだ確かめていないのは S3 Tables 側。
+
+- S3 Tables 本体(テーブルバケット・自動コンパクション・オブジェクト監視課金)。
+  一度 apply して空テーブルの作成まで確認したが、データを入れた比較はしていない
+- 両構成のコスト。試算も実測もまだ無い
+
+S3 Tables の Terraform は段階的に足すため [`terraform/later/`](terraform/later/README.md)
+に退避してある(読み込み対象外)。戻す手順はそちらの README。素の構成の手順は
 [`terraform/README.md`](terraform/README.md)。
-
-S3 Tables に向けるときは、ノートブックのカタログ生成をこう差し替える。
-
-```python
-from pyiceberg.catalog import load_catalog
-
-catalog = load_catalog("s3tables", **{
-    "type": "rest",
-    "uri": "https://glue.<region>.amazonaws.com/iceberg",
-    "rest.sigv4-enabled": "true",
-})
-```
-
-権限は IAM と(Glue エンドポイント経由なら)Lake Formation の grant が必要。
-2026-03 の「S3 Tables / Iceberg マテビューの IAM ベース認可」対応で、
-ストレージ・カタログ・クエリの権限を単一の IAM ポリシーに寄せられる。
 
 ## 出典
 
@@ -110,9 +109,9 @@ catalog = load_catalog("s3tables", **{
 (`data/prefectures/` は `.gitignore`)。
 
 集計結果は `out/prefecture_comparison.json` にコミットしてあるので、全国比較の数値と
-19ファイルのヘッダは clone しただけで参照できる。データを取り直して
-`notebooks/prefecture_schemas.py` を再実行したい場合は、各県のポータルから
-自分でダウンロードする(`make verify` はデータが無ければ SKIP と表示する)。
+19ファイルのヘッダは clone しただけで参照できる。集計していたノートブックは
+2026-10-04 に外したので、取り直すには各県のポータルからデータをダウンロードした上で
+`git show 64c9f75:notebooks/prefecture_schemas.py` を取り出す必要がある。
 
 JAWS-UG 支部一覧は <https://jaws-ug.jp/act/> より取得。
 

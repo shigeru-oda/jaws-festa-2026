@@ -1,0 +1,42 @@
+[
+  {
+    "name": "nen_fingerprint",
+    "description": "scripts/sql/nen_fingerprint.sql をそのまま実行",
+    "state": "SUCCEEDED",
+    "reason": "",
+    "scanned_bytes": 884668,
+    "millis": 975,
+    "rows": [
+      [
+        "teigi",
+        "block",
+        "gyo",
+        "saishuretsu_nonnull"
+      ],
+      [
+        "128列定義",
+        "2015",
+        "390",
+        "390"
+      ],
+      [
+        "128列定義",
+        "2020",
+        "468",
+        "0"
+      ],
+      [
+        "127列定義",
+        "2015",
+        "390",
+        "390"
+      ],
+      [
+        "127列定義",
+        "2020",
+        "468",
+        "468"
+      ]
+    ]
+  }
+]

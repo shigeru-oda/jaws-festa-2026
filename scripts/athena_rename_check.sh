@@ -2,9 +2,12 @@
 #
 # 実機 Athena で「列名のリネームに気づけない」ことを確認する。
 #
-# ローカル(notebooks/rename_blindspot.py)で確定させた機序を、本物の S3 + Glue +
+# ローカルで確定させた機序を、本物の S3 + Glue +
 # Athena で再現する。テーブル定義は 2020 年版のヘッダから作り、そこへ 2024 年版
 # (26 列が改称されたファイル)を同じプレフィックスに置く。
+#
+# 同じことを Terraform と保存クエリでやるのが terraform/athena_jinkousetai.tf。
+# こちらは単独で動く確認用。
 #
 # 使い方:
 #   aws sts get-caller-identity              # 認証が通っているか確認

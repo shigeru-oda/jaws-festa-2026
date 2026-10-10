@@ -9,13 +9,11 @@ wheels/
 # Virtual environments
 .venv
 
-# 検証で再生成されるもの
-work/
-out/*.html
-
 # marimo のセッションキャッシュ
 notebooks/__marimo__/
 
 # 他県のデータは再配布しない(ライセンスが県ごとに異なるため)。
 # 集計結果は out/prefecture_comparison.json にコミットしてある。
 data/prefectures/
+.DS_Store
+terraform/.prof.local

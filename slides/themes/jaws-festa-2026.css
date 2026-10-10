@@ -257,11 +257,20 @@ section.section p {
   margin: 24px 0 0;
 }
 
-/* 大きいエンブレムを右に。元テンプレは x=736 から幅 539 で、タイトル枠と少し重なる */
+/* 大きいエンブレムを右に。元テンプレは x=736 から幅 539 で、タイトル枠と少し重なる。
+   この節だけ不透明度 20%(alphaModFix amt="20000") かつ +21.99度の回転
+   (rot="1319143")が掛かっている。表紙のエンブレムと本文の横ロゴはどちらも素のまま。
+   回転は背景画像には掛けられないので、::before 自体をエンブレムの矩形に縮めて回す。
+   PowerPoint も図形の中心を軸に回すので、同じ矩形に置けば見た目が一致する。 */
 section.section::before {
+  inset: 212px 4px auto auto;
+  width: 539px;
+  height: 480px;
   background-image: var(--festa-img-logo-emblem);
-  background-position: right 4px top 212px;
-  background-size: 539px auto;
+  background-position: center;
+  background-size: contain;
+  opacity: 0.2;
+  transform: rotate(21.99deg);
 }
 
 /* ---- 扉（元テンプレ 3 枚目 SECTION_HEADER_1: 地色なし） ---- */

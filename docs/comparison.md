@@ -1,7 +1,8 @@
-# 素の S3+Athena と S3 Tables は何が違うのか — ローカル再現
+# 素の S3+Athena と S3 Tables は何が違うのか
 
-実装は `notebooks/athena_vs_s3tables.py`、実測値は `out/athena_vs_s3tables.json`。
-`make verify` で再生成と検査ができる。
+実測値は `out/athena_vs_s3tables.json`。これを出していたノートブックは 2026-10-04 に
+外したので、コミット済みの JSON が正本(生成コードは `git show 64c9f75:notebooks/athena_vs_s3tables.py`)。
+`make check` で原稿との突き合わせができる。
 
 題材は秋田県「人口移動理由実態調査」の 2013-2018 版(19列)と 2019-2025 版(16列)。
 **2019 年に理由の分類そのものが 11 項目から 8 項目へ再編された**(統合・分割・削除が同時)。

@@ -1,5 +1,5 @@
 variable "region" {
-  description = "リソースを作るリージョン。S3 Tables は ap-northeast-1 で利用可能(2026-08 時点で確認済み)。"
+  description = "リソースを作るリージョン。"
   type        = string
   default     = "ap-northeast-1"
 }
@@ -18,39 +18,6 @@ variable "name_prefix" {
   validation {
     condition     = can(regex("^[a-z0-9][a-z0-9-]{1,30}[a-z0-9]$", var.name_prefix))
     error_message = "name_prefix は小文字・数字・ハイフンのみで、3〜32文字にしてください。"
-  }
-}
-
-variable "namespace" {
-  description = "S3 Tables の名前空間。小文字・数字・アンダースコアのみ。"
-  type        = string
-  default     = "akita"
-}
-
-variable "table_name" {
-  description = "Terraform が作る Iceberg テーブル名。ノートブックは別テーブルを PyIceberg で作る。"
-  type        = string
-  default     = "idouriyuu_tf"
-}
-
-variable "enable_compaction" {
-  description = <<-EOT
-    テーブルの自動コンパクションを有効にするか。
-    数MBのデータでは出番が無い(登壇で示す論点そのもの)が、
-    設定の存在と既定値を見せるために明示的に書いてある。
-  EOT
-  type        = bool
-  default     = true
-}
-
-variable "target_file_size_mb" {
-  description = "コンパクションの目標ファイルサイズ(MB)。64〜512。"
-  type        = number
-  default     = 64
-
-  validation {
-    condition     = var.target_file_size_mb >= 64 && var.target_file_size_mb <= 512
-    error_message = "target_file_size_mb は 64〜512 の範囲にしてください。"
   }
 }
 
@@ -73,4 +40,25 @@ variable "force_destroy" {
   EOT
   type        = bool
   default     = true
+}
+
+variable "drift_generation" {
+  description = <<-EOT
+    athena_drift.tf が S3 に置くデータの世代。
+    「データを追加していく中で参照先が変わるか」を測るための切り替えスイッチ。
+
+      1 = 列が減る前だけ 年齢各歳 1980〜2015ブロック(8本・128列) / 月報 2008〜2023(16本・旧名称)
+      2 = 追加後       年齢各歳 +2020ブロック(127列)          / 月報 +2006,2007,2024〜2026(新名称)
+
+    世代1で apply して名前付きクエリを流し、結果を控えてから世代2で apply し直し、
+    同じクエリを同じ順で流す。テーブル定義は一度も触らない。
+    手元での期待値は ./scripts/verify_drift.py が出す。
+  EOT
+  type        = number
+  default     = 1
+
+  validation {
+    condition     = contains([1, 2], var.drift_generation)
+    error_message = "drift_generation は 1 か 2 にしてください。"
+  }
 }
