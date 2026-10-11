@@ -197,8 +197,8 @@ CKAN の `Content-Length` と一致することを確認済み。
 
 CKAN データセット [`050008_toukeika_031`](https://ckan.pref.akita.lg.jp/dataset/050008_toukeika_031)
 （年齢別人口流動調査 月報バックナンバーデータ）の CSV を全件そのまま置いたもの。
-Terraform（`terraform/athena_jinkousetai.tf`）が S3 に上げて Athena から引く対象。
-取り直しは `./scripts/fetch_jinkousetai.sh`。
+現在の Terraform は扱わない（2026-10-11 に年齢各歳 `050008_toukeika_032` だけに絞った）。
+取得・検査スクリプト `scripts/fetch_jinkousetai.sh` も同日に削除した。
 
 | ファイル | 列 | 行 | 見出しの流派 |
 | --- | --- | --- | --- |
@@ -323,7 +323,7 @@ Public Data License 1.0 / 政府標準利用規約系）再配布できないた
 
 `位置20 == 位置23 + 位置24` は21年分 8,119行すべてで成立（不一致 0）。欠測245行は
 県計の行で県内転入・県内転出が `***` になっているぶん（県内移動を加味しないため）。
-検算は `./scripts/fetch_jinkousetai.sh --check` が毎回やり直す。
+検算は削除済みの `scripts/fetch_jinkousetai.sh --check` でやっていた（2026-10-11 削除）。
 
 詳細と過大率の実測は [`comparison.md`](comparison.md) と `out/rename_blindspot.json`。
 

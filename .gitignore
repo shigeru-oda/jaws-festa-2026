@@ -15,5 +15,9 @@ notebooks/__marimo__/
 # 他県のデータは再配布しない(ライセンスが県ごとに異なるため)。
 # 集計結果は out/prefecture_comparison.json にコミットしてある。
 data/prefectures/
+
+# data/ 配下の CSV は CKAN から取り直せるのでコミットしない。
+# 取得は ./data/fetch_nenreikakusai.sh
+data/**/*.csv
 .DS_Store
 terraform/.prof.local

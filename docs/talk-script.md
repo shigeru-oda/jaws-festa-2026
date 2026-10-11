@@ -428,6 +428,6 @@ iceberg_unreferenced_file_removal = { unreferenced_days = 3, non_current_days = 
 3. **S11 の「同じ集計をもう一度」を実機で作る** — S2の4つの数字をS3 Tables上のSQLで出し、
    素の構成の誤った値と並べる。ここが今回の構成の要
 4. ~~**実機Athenaの確認**~~ — 2026-08-13 に**両ケース完了**。ローカル再現と完全一致
-   (`scripts/athena_rename_check.sh` / `scripts/athena_shift_check.sh`)
+   (`scripts/athena_rename_check.sh` / `scripts/athena_shift_check.sh`。2026-10-11 に削除)
 5. スライド作成(15枚 + Q&A用の予備)。テーマは `slides/` の Marp 移植版を使う
 6. 通しリハーサル2回(S7とS9だけ重点的に)

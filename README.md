@@ -52,7 +52,7 @@ make help       # 他のターゲット
 | `terraform/later/` | S3 Tables の定義。段階的に足すため読み込み対象から外してある |
 | `scripts/run_athena_queries.py` | Athena の保存クエリを順に実行して `out/athena_*.json` に落とす |
 | `scripts/verify_drift.py` | Athena の読み方(位置読み・NULL 詰め)を手元で再現して期待値を出す |
-| `scripts/fetch_jinkousetai.sh` / `fetch_nenreikakusai.sh` | CKAN から CSV を取り直して列構成を検査する |
+| `scripts/fetch_nenreikakusai.sh` | CKAN から年齢各歳 CSV を取り直して列構成を検査する(取得だけなら `data/fetch_nenreikakusai.sh`) |
 | `scripts/check_talk_numbers.py` | 原稿の数字が実測値と一致しているかの検査 |
 | `scripts/retime_talk_script.py` | 原稿の尺(見出しの時刻・尺表)を文字数から再生成 |
 | `out/*.json` | 実測値の一次情報。原稿や README の数字はここが根拠。再生成元を持たないのでコミット済みのものが正本 |

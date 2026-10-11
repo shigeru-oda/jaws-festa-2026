@@ -73,6 +73,16 @@ table { font-size: 0.80em; }
 
 ---
 
+## データの品質チェックのやり方（１例）
+<style scoped>
+ul { column-count: 1; column-gap: 28px; font-size: 0.62em; line-height: 1.6; margin-top: 10px; }
+li { break-inside: avoid; }
+</style>
+
+- CSVデータをDownLoad
+
+---
+
 ## オープンデータを可視化してた時の違和感
 
 "県・市町村の年齢各歳、男女別人口"のデータセットを以下準備を行い可視化を行いました。
@@ -86,6 +96,7 @@ table { font-size: 0.80em; }
 ---
 
 ## 2019年のデータ 95～99歳
+
 <style scoped>
 p { text-align: center; margin: 0; }
 </style>
@@ -98,6 +109,7 @@ p { text-align: center; margin: 0; }
 ---
 
 ## 2020年のデータ 95～99歳 -> 全データがNull
+
 <style scoped>
 p { text-align: center; margin: 0; }
 </style>
@@ -110,6 +122,7 @@ p { text-align: center; margin: 0; }
 ---
 
 ## 年齢不詳カラムが消えていた
+
 <style scoped>
 p { text-align: center; margin: 0; }
 </style>
@@ -171,6 +184,7 @@ DuckDB 1.5.5 で実測
 # 出典と検証コード
 
 この資料は以下の著作物を改変して利用しています。
+
 - [秋田県オープンデータカタログサイト](https://opendata.pref.akita.lg.jp/)
 - [クリエイティブ・コモンズ・ライセンス 表示 4.0](https://creativecommons.org/licenses/by/4.0/legalcode.ja)
 

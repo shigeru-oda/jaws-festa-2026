@@ -9,7 +9,6 @@ CLI 内部の SDK に任せる。
   ./scripts/run_athena_queries.py --prefix drift_ --profile <名前> --tag gen1
       -> out/athena_drift_gen1.json に結果を書く
 
-  ./scripts/run_athena_queries.py --prefix jinkousetai_ --profile <名前>
 """
 
 from __future__ import annotations
