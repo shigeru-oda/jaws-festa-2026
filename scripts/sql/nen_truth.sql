@@ -10,7 +10,7 @@
 -- 実行:
 --   ./scripts/run_athena_queries.py --profile "$(cat terraform/.prof.local)" \
 --     --sql scripts/sql/nen_truth.sql --tag gen2
-SELECT block,
+SELECT regexp_extract("$path", '_([0-9]{4})\.csv$', 1) AS block,
        nengetsubi,
        age_100_plus  AS pos106_100ijou,
        age_cls_0_4   AS pos107_0_4,
@@ -18,7 +18,7 @@ SELECT block,
        age_cls_10_14 AS pos109_10_14,
        age_cls_90_94 AS pos125_90_94,
        age_cls_95_99 AS pos126_95_99
-FROM drift_nenreikakusai_127
+FROM bronze_nenreikakusai_127
 WHERE shichoson = '秋田県'
   AND danjo = '男女計（人）'
   AND nengetsubi IN ('2019年10月1日現在', '2020年10月1日現在', '2025年10月1日現在')

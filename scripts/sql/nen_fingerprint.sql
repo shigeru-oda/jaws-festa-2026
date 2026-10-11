@@ -20,7 +20,7 @@ SELECT '128列定義' AS teigi,
        block,
        count(*)             AS gyo,
        count(age_cls_95_99) AS saishuretsu_nonnull
-FROM drift_nenreikakusai_128
+FROM (SELECT *, regexp_extract("$path", '_([0-9]{4})\.csv$', 1) AS block FROM bronze_nenreikakusai_128)
 WHERE block IN ('2015', '2020')
 GROUP BY block
 UNION ALL
@@ -28,7 +28,7 @@ SELECT '127列定義' AS teigi,
        block,
        count(*)             AS gyo,
        count(age_cls_95_99) AS saishuretsu_nonnull
-FROM drift_nenreikakusai_127
+FROM (SELECT *, regexp_extract("$path", '_([0-9]{4})\.csv$', 1) AS block FROM bronze_nenreikakusai_127)
 WHERE block IN ('2015', '2020')
 GROUP BY block
 ORDER BY teigi DESC, block

@@ -7,7 +7,7 @@
 -- 実行:
 --   ./scripts/run_athena_queries.py --profile "$(cat terraform/.prof.local)" \
 --     --sql scripts/sql/nen_boundary.sql --tag gen2
-SELECT block,
+SELECT regexp_extract("$path", '_([0-9]{4})\.csv$', 1) AS block,
        nengetsubi,
        age_99        AS pos105_99sai,
        age_100_plus  AS pos106_100ijou,
@@ -16,7 +16,7 @@ SELECT block,
        age_cls_5_9   AS pos109_5_9,
        age_cls_90_94 AS pos126_90_94,
        age_cls_95_99 AS pos127_95_99
-FROM drift_nenreikakusai_128
+FROM bronze_nenreikakusai_128
 WHERE shichoson = '秋田県'
   AND danjo = '男女計（人）'
 ORDER BY nengetsubi

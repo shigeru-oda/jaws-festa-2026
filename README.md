@@ -6,7 +6,7 @@ JAWS FESTA 2026 in AKITA(2026-11-07)登壇
 [タイムテーブル](https://jawsfesta2026.jaws-ug.jp/timetable/4268f6be-274a-45f1-b5e3-ec5b56c0a0f7)
 
 登壇ではライブデモを行わない。ここで得た数値と図をスライドに載せる。
-計測は AWS 上の Athena で行う(`terraform apply` → `make athena`)。
+計測は AWS 上の Athena で行う(`terraform apply` → Athena で SQL を実行)。
 手元のスクリプトは標準ライブラリだけで動く。
 
 ## 分かったこと
@@ -31,15 +31,14 @@ CSV 直読みのほうが速く、コンパクションの出番もない。
 ```sh
 make check      # 登壇原稿の数字が out/*.json と一致しているか検査する(AWS 認証情報は不要)
 make tf-check   # Terraform の整形チェックと検証(AWS 認証情報は不要)
-make athena     # AWS 上の保存クエリを実行して結果を取り直す(AWS 認証情報が必要)
 make help       # 他のターゲット
 ```
 
 `make check` が通れば、`docs/talk-script.md` に書いた数字は `out/*.json` の実測値と
 一致している。数字がずれたらここで落ちる。標準ライブラリだけで動くので `uv sync` は要らない。
 
-計測そのものは AWS 上で行う。`terraform apply` して `make athena` を回すと、Athena の
-保存クエリ12本の結果が `out/athena_drift_gen*.json` に落ちる。
+計測そのものは AWS 上で行う。`terraform apply` したあと、`scripts/sql/*.sql` を
+`./scripts/run_athena_queries.py --profile <名前> --sql <ファイル>` で流すと結果が `out/` に落ちる。
 
 ## 構成
 
@@ -66,7 +65,7 @@ make help       # 他のターゲット
 
 | ファイル | 主な内容 | 取り直し |
 | --- | --- | --- |
-| `out/athena_drift_gen1.json` / `gen2.json` | Athena 実機での参照先ドリフト(世代1 / 世代2) | `make athena` |
+| `out/athena_drift_gen1.json` / `gen2.json` | Athena 実機での参照先ドリフト(世代1 / 世代2。保存クエリ削除前の記録) | 取り直し不可 |
 | `out/drift_verification.json` | 同じ検証の手元での期待値 | `scripts/verify_drift.py` |
 | `out/rename_blindspot.json` | リネームの内訳 / 意味が不変であることの検算 / 過大率 | 不可(コミット済みが正本) |
 | `out/athena_vs_s3tables.json` | 誤読の内訳 / 検算の通過率 / Iceberg の列数・snapshot / 規模と速度 | 不可 |

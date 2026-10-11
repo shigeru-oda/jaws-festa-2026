@@ -40,24 +40,3 @@ variable "force_destroy" {
   type        = bool
   default     = true
 }
-
-variable "drift_generation" {
-  description = <<-EOT
-    S3 に置く年齢各歳 CSV(050008_toukeika_032)の世代。
-    「データを追加していく中で参照先が変わるか」を測るための切り替えスイッチ。
-
-      1 = 列が減る前だけ 1980〜2015ブロック(8本・128列)
-      2 = 追加後       +2020ブロック(127列)
-
-    世代1で apply して名前付きクエリを流し、結果を控えてから世代2で apply し直し、
-    同じクエリを同じ順で流す。テーブル定義は一度も触らない。
-    手元での期待値は ./scripts/verify_drift.py が出す。
-  EOT
-  type        = number
-  default     = 1
-
-  validation {
-    condition     = contains([1, 2], var.drift_generation)
-    error_message = "drift_generation は 1 か 2 にしてください。"
-  }
-}
