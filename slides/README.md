@@ -6,8 +6,6 @@ JAWS FESTA 2026 in AKITA 登壇スライド。公式スライドテンプレー�
 | ファイル | 役割 |
 |---|---|
 | `main.md` | 本番スライド。全32枚。`docs/talk-script.md` の15節を1枚ずつ起こしたもの＋表紙・自己紹介・カタログ紹介の3枚＋Q&A用の予備3枚＋付録10枚（カタログ収録データセット全件、当日は飛ばす） |
-| `template.md` | 素のひな形。元テンプレート5レイアウトのプレースホルダ文字のまま |
-| `deck.md` | レイアウト見本。全レイアウトにサンプル文字を入れたもの |
 | `themes/jaws-festa-2026.css` | 生成物。marp が読むテーマ |
 | `theme-src/jaws-festa-2026.src.css` | テーマの編集元。直すのはこちら |
 | `tools/build_theme.py` | src の画像参照を data URI に埋め込んで themes/ を生成する |
