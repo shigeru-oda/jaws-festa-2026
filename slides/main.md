@@ -73,25 +73,126 @@ table { font-size: 0.80em; }
 
 ---
 
-## データの品質チェックのやり方（１例）
+## データセットのチェックの仕方
+
 <style scoped>
-ul { column-count: 1; column-gap: 28px; font-size: 0.62em; line-height: 1.6; margin-top: 10px; }
-li { break-inside: avoid; }
+p { margin: 0; }
+table { font-size: 0.8em; margin-top: 14px; }
 </style>
 
-- CSVデータをDownLoad
+外部から手に入れたデータセットでのチェックの仕方を一例としてお伝えします。
+`県・市町村の年齢各歳、男女別人口`というデータセットを利用しています。
+
+| 項目     | 内容                                                                    |
+| -------- | ----------------------------------------------------------------------- |
+| 期間     | 1980〜2025年                                                            |
+| ファイル | 5年ごとに1本、計9本のCSV（UTF-8 BOM付き）                               |
+| 地域     | 秋田県計 ＋ 市町村                                                      |
+| 行       | 年 × 地域 × 男女別（男女計・男・女）                                    |
+| 列       | 年月日・市町村コード・市町村・男女別・総数・0〜100歳以上の各歳・5歳階級 |
 
 ---
 
-## オープンデータを可視化してた時の違和感
+## Sampleデータ
 
-"県・市町村の年齢各歳、男女別人口"のデータセットを以下準備を行い可視化を行いました。
+<style scoped>
+p { margin: 0; }
+table { font-size: 0.75em; margin-top: 14px; }
+td:nth-child(2) { text-align: right; }
+</style>
 
-- Amazon S3でバケット作成
-- AWS Glueでテーブル定義作成
-- Amazon SageMaker Unified Studioで検索・可視化を実施
+`pref_nenreikakusai_2020.csv` の1行（2025年・秋田県・男女計）
 
-しかし、このデータセットはある時期からデータがおかしくなることが分かりました。
+| カラム          |                値 |
+| --------------- | ----------------: |
+| 年月日コード    |        2025001001 |
+| 年月日          | 2025年10月1日現在 |
+| 市町村コード    |              5000 |
+| 市町村          |            秋田県 |
+| 男女別          |      男女計（人） |
+| 総数            |           878,798 |
+| 0歳(1歳刻み)    |             3,068 |
+| 0～4歳(5歳刻み) |            18,782 |
+
+---
+
+## データセットのチェックの仕方 構成図
+
+<style scoped>
+p { margin: 0; }
+p:has(img) { text-align: center; margin-top: 16px; }
+</style>
+
+![h:550](./image/dataset-check.drawio.png)
+
+---
+
+## データセットのチェックの仕方 Landing層
+
+<style scoped>
+ul { column-count: 1; column-gap: 28px; font-size: 0.8em; line-height: 1.6; margin-top: 10px; }
+li { break-inside: avoid; }
+</style>
+
+方針
+
+- 文字コード、改行コード、半構造体であること
+- 型やデータ
+
+チェック内容
+
+- 文字コードがUTF-8であるか または 変換可能であること
+- 改行コードはLFであるか または 変換可能であること
+- 構造化データ または 半構造化データでTable変換可能であること
+- "で囲みがないこと(","などのエスケープされたカンマがあることを危惧)
+- 列数がヘッダとデータで差異はないこと
+- 空行がないこと
+
+---
+
+## データセットのチェックの仕方 Bronze層
+
+<style scoped>
+ul { column-count: 1; column-gap: 28px; font-size: 0.8em; line-height: 1.6; margin-top: 10px; }
+li { break-inside: avoid; }
+</style>
+
+方針
+
+- 元データの内容を型変換などせず素直に取り込むこと
+- 全カラムString型とすること
+- 単項目・簡単な相関チェックを実施すること
+
+チェック内容
+
+- CSVファイルとTable件数が同じであること
+- 数値型となる想定の型は数値変換が可能であること
+- 合算の計算があうこと
+- キー重複がないこと
+- 男女計・男・女が1行ずつあるか
+
+---
+
+## データセットのチェックの仕方 Silver層
+
+<style scoped>
+ul { column-count: 1; column-gap: 28px; font-size: 0.8em; line-height: 1.6; margin-top: 10px; }
+li { break-inside: avoid; }
+</style>
+
+方針
+
+- 可視化でのチェックを行うこと
+
+チェック内容
+
+- Bronze層と件数が同じであること
+- 5歳階級の推移を可視化
+- 人口ピラミッドを可視化
+- '-'とマイナスの分布を可視化
+- 総数の推移を可視化
+- 数値カラムごとのNULLとマイナスを可視化
+- 年 × 各歳のヒートマップ可視化
 
 ---
 
@@ -138,6 +239,7 @@ table { font-size: 0.62em; }
 th, td { padding: 5px 8px; text-align: center; white-space: nowrap; }
 th:first-child, td:first-child { text-align: left; }
 p { font-size: 0.55em; margin: 6px 0; }
+ul { font-size: 0.62em; line-height: 1.5; margin: 8px 0 0; }
 </style>
 
 | 予想されるスキーマ更新のタイプ         | CSV / TSV<br>(ヘッダー有無とも) | JSON | AVRO | PARQUET<br>名前で読む<br>(既定) | PARQUET<br>インデックス<br>で読む | ORC<br>インデックス<br>で読む(既定) | ORC<br>名前で読む |
@@ -148,6 +250,9 @@ p { font-size: 0.55em; margin: 6px 0; }
 | 列の削除                               |                N                |  Y   |  Y   |                Y                |                 N                 |                  N                  |         Y         |
 | 列の順序変更                           |                N                |  Y   |  Y   |                Y                |                 N                 |                  N                  |         Y         |
 | 列のデータ型の変更                     |                Y                |  Y   |  Y   |                Y                |                 Y                 |                  Y                  |         Y         |
+
+- Y = その形式はこのスキーマ変更に対応している（クエリを変えずに読み続けられる）
+- N = 対応していない（CSV は位置で読むのでエラーにならず、値がずれたまま返る）
 
 出典: Amazon Athena ユーザーガイド「スキーマの更新を処理する」の表「Athena におけるスキーマ更新とデータ形式」
 
@@ -176,6 +281,48 @@ DuckDB 1.5.5 で実測
 
 <!--
 -->
+
+---
+
+## Parquet化すれば課題は解決するのでは？
+
+<style scoped>
+table { font-size: 0.66em; }
+th, td { padding: 5px 8px; }
+th:first-child, td:first-child { white-space: nowrap; }
+p { font-size: 0.62em; margin: 10px 0 0; }
+</style>
+
+| 列の同定         | CSV<br>位置で読む | Parquet<br>名前で読む | Iceberg<br>field ID で読む |
+| ---------------- | ----------------- | --------------------- | -------------------------- |
+| 列の削除         | 値がずれる        | NULL（正しい）        | NULL（正しい）             |
+| 先頭・中間に追加 | 値がずれる        | 影響なし              | 影響なし                   |
+| 列の順序変更     | 値がずれる        | 影響なし              | 影響なし                   |
+| 列の名前変更     | 気づけない        | NULL / エラー         | 影響なし                   |
+
+今回の`年齢不詳`は「列の削除」なので、Parquet化すれば正しく読めます
+一方で名前が変わる場合もありますが、この課題にしては Iceberg は名前ではなく field ID で指定するため、有効策となります。
+
+---
+
+## Paruet or Iceberg にする理由
+
+<style scoped>
+table { font-size: 0.66em; }
+th, td { padding: 6px 8px; }
+th:first-child, td:first-child { white-space: nowrap; }
+p { font-size: 0.62em; margin: 10px 0 0; }
+</style>
+
+ファイル形式の話ではなく、テーブルとして持つか否かの話
+
+|                  | S3 に置く（CSV / Parquet）                                       | S3 Tables（Iceberg）                  |
+| ---------------- | ---------------------------------------------------------------- | ------------------------------------- |
+| スキーマの検査   | 読むときに当てるだけ。定義とファイルが食い違っても通る場合がある | 書くときに検査。合わないDMLは失敗する |
+| 列が変わった履歴 | 残らない                                                         | snapshot に残る（いつ消えたか分かる） |
+| 書き込み         | 置き換えの途中が見える                                           | アトミックなコミット                  |
+| 過去の数字の再現 | 自分で版を管理                                                   | time travel（snapshot ID / 時刻）     |
+| 遡った訂正       | ファイルを作り直す                                               | `UPDATE` / `DELETE` / `MERGE INTO`    |
 
 ---
 
