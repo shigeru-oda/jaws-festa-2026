@@ -14,6 +14,13 @@ notebooks/__marimo__/
 
 # data/ 配下の CSV は CKAN から取り直せるのでコミットしない。
 data/**/*.csv
+# CKAN から取り直せる(scripts/fetch_akita_opendata.py)。台帳も取得のたびに変わる
+data/akita_opendata/
+# ノートブックを手元で実行したときの出力
+notebooks/opendata_report/
 
 .DS_Store
 terraform/.prof.local
+
+# 作業ディレクトリ(make clean で消える)
+work/

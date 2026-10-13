@@ -52,14 +52,35 @@ make help       # 他のターゲット
 | `scripts/run_athena_queries.py` | Athena の保存クエリを順に実行して `out/athena_*.json` に落とす |
 | `scripts/verify_drift.py` | Athena の読み方(位置読み・NULL 詰め)を手元で再現して期待値を出す |
 | `scripts/fetch_nenreikakusai.sh` | CKAN から年齢各歳 CSV を取り直して列構成を検査する(取得だけなら `data/fetch_nenreikakusai.sh`) |
+| `scripts/fetch_akita_opendata.py` | 秋田県 CKAN の CSV 形式リソースを全部取得して台帳(`manifest.json`)を作る |
+| `scripts/upload_opendata_landing.sh` | 取得した CSV を landing(`akita/landing/opendata/`)へ上げる |
+| `notebooks/opendata_landing_to_bronze.ipynb` | landing → bronze。文字コード(CP932 等)・改行だけ UTF-8 / LF にそろえる |
+| `notebooks/opendata_bronze_report.ipynb` | bronze を直接読み、機械判読性12項目の評価と図を自己完結 HTML 1枚に出す |
 | `scripts/check_talk_numbers.py` | 原稿の数字が実測値と一致しているかの検査 |
 | `scripts/retime_talk_script.py` | 原稿の尺(見出しの時刻・尺表)を文字数から再生成 |
+| `scripts/measure_duckdb_matrix.py` | スキーマ変更ごとに形式・読み方で何が起きるかを DuckDB で実測(`uv run --with duckdb --no-project` で動かす) |
 | `out/*.json` | 実測値の一次情報。原稿や README の数字はここが根拠。再生成元を持たないのでコミット済みのものが正本 |
 | `out/*.png` | スライド用の図。同じく正本(`make clean` では消さない) |
 | `data/akita/` | 秋田県ポータルの CSV 19本 + XLSX 1本 |
 | `data/akita_idouriyuu/` | 人口移動理由実態調査 CSV 6本 |
 | `data/prefectures/` | 他県の市町村別人口 CSV。**ライセンスが県ごとに異なるため追跡しない**(下記) |
 | `data/jawsug/` | JAWS-UG 支部一覧(43支部 / 39都道府県) |
+
+## 秋田県オープンデータ全体の評価レポート
+
+CSV 形式で公開されている全データセット(114件・CSV 559本、50MB 超の地震被害想定と中身が XLSX のものは除外)を
+landing → bronze → HTML の順に流す。bronze は Athena を通さずノートブックが直接読む。
+
+```sh
+make opendata-fetch     # data/akita_opendata/ に取得(約4分・26MB)
+make opendata-upload    # landing へ(AWS 認証が要る)
+make opendata-local     # 2本のノートブックを AWS に触らず手元で実行 -> work/opendata/opendata_report/index.html
+```
+
+SageMaker では `opendata_landing_to_bronze.ipynb` → `opendata_bronze_report.ipynb` の順に実行する
+(どちらも `DRY_RUN = True` が既定)。HTML は `akita/reports/opendata/index.html` に書く。
+公開用バケットへのコピーはノートブックの外で行う。HTML は外部を読み込まず(JavaScript なし・CSP 付き)、
+バケット名・アカウント ID が入っていないことを書き出す前に検査している。
 
 ## 実測値の一次情報
 
