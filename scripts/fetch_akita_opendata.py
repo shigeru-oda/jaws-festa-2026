@@ -4,7 +4,7 @@
 出典: 秋田県オープンデータカタログサイト <https://ckan.pref.akita.lg.jp/> (CC BY 4.0)
 
     ./scripts/fetch_akita_opendata.py                 # 50MB 以下の CSV を全部
-    ./scripts/fetch_akita_opendata.py --max-mb 0      # サイズ上限なし(地震被害想定の格子データ 3.4GB も落とす)
+    ./scripts/fetch_akita_opendata.py --max-mb 0      # サイズ上限なし(地震被害想定の格子データ 27本・3.4GB も落とす)
     ./scripts/fetch_akita_opendata.py --dataset 050008_toukeika_039
 
 保存先は data/akita_opendata/<データセット名>/<リソースID先頭8桁>_<元のファイル名>。
@@ -55,6 +55,31 @@ def get(url: str, timeout: int = 120) -> bytes:
     raise AssertionError("unreachable")
 
 
+def download(url: str, out: Path, timeout: int = 120) -> tuple[int, str, bytes]:
+    """url を out へ少しずつ書く(130MB 級の CSV もメモリに載せない)。(バイト数, sha256, 先頭8バイト) を返す。
+    途中で失敗したら書きかけを消して3回まで取り直す。"""
+    req = urllib.request.Request(url, headers={"User-Agent": UA})
+    tmp = out.with_name(out.name + ".part")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    for attempt in range(3):
+        try:
+            h, n, head = hashlib.sha256(), 0, b""
+            with urllib.request.urlopen(req, timeout=timeout) as r, open(tmp, "wb") as f:
+                while chunk := r.read(1 << 20):
+                    head = head or chunk[:8]
+                    h.update(chunk)
+                    f.write(chunk)
+                    n += len(chunk)
+            tmp.replace(out)
+            return n, h.hexdigest(), head
+        except Exception:  # noqa: BLE001
+            tmp.unlink(missing_ok=True)
+            if attempt == 2:
+                raise
+            time.sleep(2 * (attempt + 1))
+    raise AssertionError("unreachable")
+
+
 def list_csv_packages() -> list[dict]:
     q = urllib.parse.urlencode({"rows": 1000, "fq": "res_format:CSV"})
     res = json.loads(get(f"{CKAN}/api/3/action/package_search?{q}"))["result"]
@@ -87,21 +112,16 @@ def fetch_one(pkg: dict, res: dict, max_bytes: int) -> dict:
     }
     if max_bytes and (res.get("size") or 0) > max_bytes:
         return entry | {"status": "skipped_large"}
+    out = DEST / entry["file"]
     try:
-        raw = get(res["url"])
+        n, sha, head = download(res["url"], out)
     except Exception as e:  # noqa: BLE001
         return entry | {"status": "error", "error": f"{type(e).__name__}: {e}"}
     for magic, kind in MAGIC.items():
-        if raw.startswith(magic):
-            return entry | {"status": "not_csv", "detected": kind, "bytes": len(raw)}
-    out = DEST / entry["file"]
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_bytes(raw)
-    return entry | {
-        "status": "ok",
-        "bytes": len(raw),
-        "sha256": hashlib.sha256(raw).hexdigest(),
-    }
+        if head.startswith(magic):
+            out.unlink()
+            return entry | {"status": "not_csv", "detected": kind, "bytes": n}
+    return entry | {"status": "ok", "bytes": n, "sha256": sha}
 
 
 def main() -> None:

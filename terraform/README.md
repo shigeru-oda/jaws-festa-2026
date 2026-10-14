@@ -1,24 +1,23 @@
-# Terraform — 素の構成(S3 + Glue + Athena)を作る
+# Terraform — 素の構成(S3 + Glue + Athena)と silver の S3 Tables を作る
 
-素の構成(汎用バケットに CSV を置いて Glue + Athena で読む)を、秋田県オープンデータで作る。
-
-S3 Tables 側はこの Terraform では**あとで足す**。一度に扱う情報量を減らすため、
-まず素の構成で「列が変わると参照先がずれる」ことを確定させ、理解できたところで
-S3 Tables を足す。コードは消しておらず [`later/`](later/) に原形で置いてある
-(Terraform はサブディレクトリを読まないので `validate` / `plan` の対象外)。
-戻す手順・必要な変数・output・プロバイダ記法の注意は [`later/README.md`](later/README.md)。
-
-副作用として、テーブルバケットのオブジェクト監視による継続課金も止まっている。
+素の構成(汎用バケットに CSV を置いて Glue + Athena で読む)と、その silver 層としての
+S3 Tables(テーブルバケット上のマネージド Iceberg)を、秋田県オープンデータで作る。
 
 扱うデータは [年齢別人口流動調査（県・市町村の年齢各歳、男女別人口）](https://ckan.pref.akita.lg.jp/dataset/050008_toukeika_032)
-(秋田県、CC BY 4.0)だけ。CSV 9本 + Glue テーブル2本(128列定義 / 127列定義)を置く。
+(秋田県、CC BY 4.0)。CSV 9本 + bronze の Glue テーブル3本 + silver の S3 Tables 3本を置く。
 CSV は `../data/akita_nenreikakusai/` から上げるので、先に `./data/fetch_nenreikakusai.sh` で取得しておく。
 
 | ファイル | 置くもの |
 | --- | --- |
 | `s3.tf` | データレイク用バケット(`akita/landing/`)・クエリ結果用バケット・CSV オブジェクト |
-| `glue.tf` | Glue DB + テーブル2本(128列定義 / 127列定義) |
+| `glue.tf` | Glue DB + bronze テーブル3本(128列定義 2本 / 127列定義 1本) |
+| `s3tables.tf` | テーブルバケット `<prefix>-silver`・名前空間 `akita`・silver テーブル3本(空のスキーマまで) |
 | `athena.tf` | ワークグループ |
+| `grant_lakeformation.sh` | silver に Lake Formation の権限を付ける(このアカウントは S3 Tables と Lake Formation の統合が有効) |
+
+silver へのデータの書き込みは Terraform ではなく `../notebooks/bronze_to_silver.ipynb` が行う。
+`later/` は S3 Tables を足す前の退避場所で、Terraform はサブディレクトリを読まないので
+`validate` / `plan` の対象外。プロバイダ記法の注意は [`later/README.md`](later/README.md) に残してある。
 
 リージョンは `ap-northeast-1`、プロファイルは `default`(どちらも `variables.tf` で変更可)。
 
@@ -131,9 +130,21 @@ PROF=$(cat terraform/.prof.local)
 
 ## 何にお金がかかるか
 
-データ総量は約 3.3MB(CSV 9本)なのでどれも小さい。費目は S3 ストレージ、Athena のスキャン量
-(最小 10MB 課金)、リクエストだけ。S3 Tables を作らないので、オブジェクト監視や
-コンパクション処理の継続課金は発生しない。
+データ総量は約 3.3MB(CSV 9本)なのでどれも小さい。汎用バケット側の費目は S3 ストレージ、
+Athena のスキャン量(最小 10MB 課金)、リクエスト。
+
+S3 Tables 側はストレージ・リクエストに加えて、**オブジェクト数に比例する監視の費用が継続して乗る**。
+Cost Explorer で 2026-10-01〜10-13 の S3 Tables(東京)は約 0.008 USD
+(監視 0.0049 / ストレージ 0.0016 / リクエスト 0.0018)。コンパクションのジョブは走っているが、
+まとめる対象が無いので請求は無かった。使わない間は `terraform destroy` で止める。
+
+メンテナンスの設定は Terraform で指定しておらず、既定値のまま(2026-10-13 に確認)。
+
+| 設定 | 単位 | 値 |
+| --- | --- | --- |
+| コンパクション | テーブル | 有効・目標 512MB・strategy auto |
+| スナップショット管理 | テーブル | 有効・保持 120 時間・最小 1 個 |
+| 未参照ファイルの削除 | バケット | 有効・未参照 3 日・非現行 10 日 |
 
 事故防止として次を入れてある。
 
@@ -167,12 +178,13 @@ bronze は landing を読める形にそろえただけの層なので、型の�
 bronze で見えなくなる。また列ずれで入ってくる値も数値なので、`bigint` にしても
 ずれは防げない。数値への変換(`try_cast`)と `-` の扱いは silver で決める。
 
-### Iceberg 側は Terraform で作らない
+### S3 Tables は空のテーブルまでを Terraform で作る
 
-S3 Tables は段階的に足す方針で `later/` に退避してある。スキーマ進化はデータ側の操作で、
-Terraform で書くと逆に不自然になるため、戻すときもテーブルの作成までを Terraform が持ち、
-データの追記は別の手段に任せる。以前はローカルの PyIceberg カタログで代替していたが、
-計測を AWS 上に寄せたので 2026-10-04 に `notebooks/` ごと外した。
+スキーマ進化やデータの入れ替えはデータ側の操作で、Terraform で書くと不自然になる。
+Terraform が持つのはテーブルバケット・名前空間・テーブルのスキーマまでで、
+データは `bronze_to_silver.ipynb` が Athena の `DELETE` + `INSERT` で書く。
+Iceberg 側の挙動の実測は `../scripts/verify_s3tables.py` が、使い捨ての名前空間 `verify` を
+作って行い、終わったら消す。
 
 ### IAM ポリシーは作らない
 
@@ -192,8 +204,9 @@ admin 権限（または同等のロール）で apply する前提にしてあ�
 | 結果書き | `s3:GetObject` `PutObject` `AbortMultipartUpload` `ListBucket` `ListBucketMultipartUploads` `ListMultipartUploadParts` | `<PREFIX>-athena-results-<ACCOUNT>` とその配下 |
 
 apply 側には別途 S3 バケット作成・Glue データベース/テーブル作成・Athena
-ワークグループ作成の権限が要る。S3 Tables を戻す場合に必要な `s3tables:*` は
-[`later/README.md`](later/README.md) に置いてある。
+ワークグループ作成の権限が要る。S3 Tables に必要な `s3tables:*` は
+[`later/README.md`](later/README.md) に置いてある。silver を Athena から読み書きするには、
+IAM に加えて Lake Formation の権限が要る(`grant_lakeformation.sh`)。
 
 ## プロバイダの書き方でハマった点
 

@@ -1,0 +1,413 @@
+{
+ "measured_at": "2026-10-13T13:06:28+00:00",
+ "region": "ap-northeast-1",
+ "engine": "Amazon Athena (Iceberg on S3 Tables)",
+ "schema_changes": [
+  {
+   "case": "列の名前変更",
+   "slide_claim": "影響なし",
+   "steps": [
+    {
+     "sql": "ALTER TABLE verify.s_0 CHANGE COLUMN b b_renamed int",
+     "state": "SUCCEEDED",
+     "error": null
+    },
+    {
+     "sql": "INSERT INTO \"s3tablescatalog/jaws-festa-2026-silver\".verify.s_0 VALUES (2, 11, 21, 31)",
+     "state": "SUCCEEDED",
+     "error": null
+    }
+   ],
+   "check": "SELECT id, b_renamed, c FROM \"s3tablescatalog/jaws-festa-2026-silver\".verify.s_0 ORDER BY id",
+   "got": [
+    [
+     "1",
+     "20",
+     "30"
+    ],
+    [
+     "2",
+     "21",
+     "31"
+    ]
+   ],
+   "expected": [
+    [
+     "1",
+     "20",
+     "30"
+    ],
+    [
+     "2",
+     "21",
+     "31"
+    ]
+   ],
+   "ok": true
+  },
+  {
+   "case": "列の削除(列を落とす)",
+   "slide_claim": "NULL(正しい)",
+   "steps": [
+    {
+     "sql": "ALTER TABLE verify.s_1 DROP COLUMN b",
+     "state": "SUCCEEDED",
+     "error": null
+    },
+    {
+     "sql": "INSERT INTO \"s3tablescatalog/jaws-festa-2026-silver\".verify.s_1 VALUES (2, 11, 31)",
+     "state": "SUCCEEDED",
+     "error": null
+    }
+   ],
+   "check": "SELECT id, a, c FROM \"s3tablescatalog/jaws-festa-2026-silver\".verify.s_1 ORDER BY id",
+   "got": [
+    [
+     "1",
+     "10",
+     "30"
+    ],
+    [
+     "2",
+     "11",
+     "31"
+    ]
+   ],
+   "expected": [
+    [
+     "1",
+     "10",
+     "30"
+    ],
+    [
+     "2",
+     "11",
+     "31"
+    ]
+   ],
+   "ok": true
+  },
+  {
+   "case": "列の削除(新しいデータに列が無い)",
+   "slide_claim": "NULL(正しい)",
+   "steps": [
+    {
+     "sql": "INSERT INTO \"s3tablescatalog/jaws-festa-2026-silver\".verify.s_2 (id, a, c) VALUES (2, 11, 31)",
+     "state": "SUCCEEDED",
+     "error": null
+    }
+   ],
+   "check": "SELECT id, a, b, c FROM \"s3tablescatalog/jaws-festa-2026-silver\".verify.s_2 ORDER BY id",
+   "got": [
+    [
+     "1",
+     "10",
+     "20",
+     "30"
+    ],
+    [
+     "2",
+     "11",
+     null,
+     "31"
+    ]
+   ],
+   "expected": [
+    [
+     "1",
+     "10",
+     "20",
+     "30"
+    ],
+    [
+     "2",
+     "11",
+     null,
+     "31"
+    ]
+   ],
+   "ok": true
+  },
+  {
+   "case": "先頭・中間に列を追加",
+   "slide_claim": "影響なし",
+   "steps": [
+    {
+     "sql": "ALTER TABLE verify.s_3 ADD COLUMNS (x int)",
+     "state": "SUCCEEDED",
+     "error": null
+    },
+    {
+     "sql": "ALTER TABLE verify.s_3 CHANGE COLUMN x x int AFTER a",
+     "state": "SUCCEEDED",
+     "error": null
+    },
+    {
+     "sql": "INSERT INTO \"s3tablescatalog/jaws-festa-2026-silver\".verify.s_3 VALUES (2, 11, 99, 21, 31)",
+     "state": "SUCCEEDED",
+     "error": null
+    }
+   ],
+   "check": "SELECT id, a, x, b, c FROM \"s3tablescatalog/jaws-festa-2026-silver\".verify.s_3 ORDER BY id",
+   "got": [
+    [
+     "1",
+     "10",
+     null,
+     "20",
+     "30"
+    ],
+    [
+     "2",
+     "11",
+     "99",
+     "21",
+     "31"
+    ]
+   ],
+   "expected": [
+    [
+     "1",
+     "10",
+     null,
+     "20",
+     "30"
+    ],
+    [
+     "2",
+     "11",
+     "99",
+     "21",
+     "31"
+    ]
+   ],
+   "ok": true
+  },
+  {
+   "case": "列の順序変更",
+   "slide_claim": "影響なし",
+   "steps": [
+    {
+     "sql": "ALTER TABLE verify.s_4 CHANGE COLUMN c c int AFTER id",
+     "state": "SUCCEEDED",
+     "error": null
+    },
+    {
+     "sql": "INSERT INTO \"s3tablescatalog/jaws-festa-2026-silver\".verify.s_4 VALUES (2, 31, 11, 21)",
+     "state": "SUCCEEDED",
+     "error": null
+    }
+   ],
+   "check": "SELECT id, a, b, c FROM \"s3tablescatalog/jaws-festa-2026-silver\".verify.s_4 ORDER BY id",
+   "got": [
+    [
+     "1",
+     "10",
+     "20",
+     "30"
+    ],
+    [
+     "2",
+     "11",
+     "21",
+     "31"
+    ]
+   ],
+   "expected": [
+    [
+     "1",
+     "10",
+     "20",
+     "30"
+    ],
+    [
+     "2",
+     "11",
+     "21",
+     "31"
+    ]
+   ],
+   "ok": true
+  },
+  {
+   "case": "列の型の変更(int → bigint)",
+   "slide_claim": "(表には無い)",
+   "steps": [
+    {
+     "sql": "ALTER TABLE verify.s_5 CHANGE COLUMN c c bigint",
+     "state": "SUCCEEDED",
+     "error": null
+    },
+    {
+     "sql": "INSERT INTO \"s3tablescatalog/jaws-festa-2026-silver\".verify.s_5 VALUES (2, 11, 21, 3000000000)",
+     "state": "SUCCEEDED",
+     "error": null
+    }
+   ],
+   "check": "SELECT id, c FROM \"s3tablescatalog/jaws-festa-2026-silver\".verify.s_5 ORDER BY id",
+   "got": [
+    [
+     "1",
+     "30"
+    ],
+    [
+     "2",
+     "3000000000"
+    ]
+   ],
+   "expected": [
+    [
+     "1",
+     "30"
+    ],
+    [
+     "2",
+     "3000000000"
+    ]
+   ],
+   "ok": true
+  }
+ ],
+ "table_features": [
+  {
+   "item": "スキーマの検査(書くときに検査。合わない DML は失敗する)",
+   "evidence": {
+    "列数が合わない INSERT": [
+     "FAILED",
+     "TYPE_MISMATCH: Insert query has mismatched column types: Table: [integer, varchar, integer], Query: [integer, varchar(3)]. If a data manifest file was generated at 's3://jaws-festa-2026-athena-results-<account>/athena-results/abd1b4a0-ba57-4d8d-9c84-2e395028a88e-manifest.csv', you may need to manually clean the data from locations specified in the manifest. Athena will not delete data in your account."
+    ],
+    "型が合わない INSERT": [
+     "FAILED",
+     "TYPE_MISMATCH: Insert query has mismatched column types: Table: [integer, varchar, integer], Query: [integer, varchar(3), varchar(4)]. If a data manifest file was generated at 's3://jaws-festa-2026-athena-results-<account>/athena-results/908d5d74-a27e-4299-8e82-e19c9b6f40e9-manifest.csv', you may need to manually clean the data from locations specified in the manifest. Athena will not delete data in your account."
+    ],
+    "失敗後の snapshot 数": [
+     1,
+     1
+    ],
+    "失敗後の行数": "2"
+   },
+   "ok": true
+  },
+  {
+   "item": "遡った訂正(UPDATE / DELETE / MERGE INTO)",
+   "evidence": {
+    "UPDATE": "SUCCEEDED",
+    "DELETE": "SUCCEEDED",
+    "MERGE INTO": "SUCCEEDED",
+    "結果": [
+     [
+      "1",
+      "秋田市",
+      "298000"
+     ],
+     [
+      "3",
+      "横手市",
+      "85000"
+     ]
+    ]
+   },
+   "ok": true
+  },
+  {
+   "item": "snapshot に履歴が残る / time travel(snapshot ID)",
+   "evidence": {
+    "snapshot(操作の順)": [
+     "append",
+     "overwrite",
+     "overwrite",
+     "overwrite"
+    ],
+    "最初の snapshot に戻した結果": [
+     [
+      "1",
+      "秋田市",
+      "300000"
+     ],
+     [
+      "2",
+      "能代市",
+      "50000"
+     ]
+    ],
+    "$history の件数": 4
+   },
+   "ok": true
+  },
+  {
+   "item": "列が消えた後に、消える前の snapshot を読む",
+   "evidence": {
+    "今の SELECT *": [
+     [
+      "1",
+      "秋田市"
+     ],
+     [
+      "3",
+      "横手市"
+     ]
+    ],
+    "最初の snapshot の SELECT *": [
+     [
+      "1",
+      "秋田市",
+      "300000"
+     ],
+     [
+      "2",
+      "能代市",
+      "50000"
+     ]
+    ],
+    "state": "SUCCEEDED",
+    "error": null
+   },
+   "note": "列を落とした後でも、最初の snapshot を指定すると消える前の列(pop)ごと読めた。列の削除そのものはデータの snapshot ではなくスキーマの版の変更なので、$snapshots には現れない",
+   "ok": true
+  }
+ ],
+ "speed": {
+  "bronze_csv": {
+   "sql": "SELECT substr(nengetsubi, 1, 4) y, sum(CAST(age_cls_0_4 AS bigint)) FROM jaws_festa_2026_akita.bronze_nenreikakusai WHERE shichoson = '秋田県' AND danjo = '男女計（人）' AND regexp_like(age_cls_0_4, '^[0-9]+$') GROUP BY 1 ORDER BY 1",
+   "engine_ms": [
+    689,
+    685,
+    552,
+    540,
+    507
+   ],
+   "total_ms": [
+    819,
+    828,
+    714,
+    684,
+    716
+   ],
+   "engine_ms_median": 552,
+   "total_ms_median": 716,
+   "scanned_bytes": 3329913,
+   "result_rows": 46
+  },
+  "silver_s3tables": {
+   "sql": "SELECT substr(nengetsubi, 1, 4) y, sum(age_cls_0_4) FROM \"s3tablescatalog/jaws-festa-2026-silver\".akita.silver_nenreikakusai WHERE shichoson = '秋田県' AND danjo = '男女計（人）' GROUP BY 1 ORDER BY 1",
+   "engine_ms": [
+    1448,
+    2147,
+    1315,
+    984,
+    1458
+   ],
+   "total_ms": [
+    1674,
+    2275,
+    1457,
+    1154,
+    1598
+   ],
+   "engine_ms_median": 1448,
+   "total_ms_median": 1598,
+   "scanned_bytes": 17402,
+   "result_rows": 46
+  }
+ }
+}
