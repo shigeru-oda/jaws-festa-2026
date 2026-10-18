@@ -15,7 +15,7 @@
 # Athena からは s3tablescatalog/<テーブルバケット名> カタログとして見える
 # (このアカウントは S3 Tables と Lake Formation の統合が有効)。
 #
-# 記法の注意(later/README.md 参照): encryption_configuration / maintenance_configuration
+# 記法の注意: encryption_configuration / maintenance_configuration
 # は属性(= { ... })、metadata はブロックで書く。
 # ─────────────────────────────────────────────────────────────────────────────
 

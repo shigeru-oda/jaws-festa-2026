@@ -16,8 +16,6 @@ CSV は `../data/akita_nenreikakusai/` から上げるので、先に `./data/fe
 | `grant_lakeformation.sh` | silver に Lake Formation の権限を付ける(このアカウントは S3 Tables と Lake Formation の統合が有効) |
 
 silver へのデータの書き込みは Terraform ではなく `../notebooks/bronze_to_silver.ipynb` が行う。
-`later/` は S3 Tables を足す前の退避場所で、Terraform はサブディレクトリを読まないので
-`validate` / `plan` の対象外。プロバイダ記法の注意は [`later/README.md`](later/README.md) に残してある。
 
 リージョンは `ap-northeast-1`、プロファイルは `default`(どちらも `variables.tf` で変更可)。
 
@@ -78,7 +76,7 @@ terraform output next_steps   # 確認手順
 AWS に上げる前の期待値は `./scripts/verify_drift.py` が出す。Athena の読み方
 (1行目を捨てる / 位置で突き合わせる / 足りない定義列は NULL / `***` は NULL)を
 手元で再現してあるので、クエリ結果が合わない場合は Terraform 側を疑える。
-`--check` を付けると期待どおりでなければ非ゼロで落ちる(`make check` に入っている)。
+`--check` を付けると期待どおりでなければ非ゼロで落ちる。
 
 ### ズレる前とズレた後をその場で見る
 
@@ -204,8 +202,8 @@ admin 権限（または同等のロール）で apply する前提にしてあ�
 | 結果書き | `s3:GetObject` `PutObject` `AbortMultipartUpload` `ListBucket` `ListBucketMultipartUploads` `ListMultipartUploadParts` | `<PREFIX>-athena-results-<ACCOUNT>` とその配下 |
 
 apply 側には別途 S3 バケット作成・Glue データベース/テーブル作成・Athena
-ワークグループ作成の権限が要る。S3 Tables に必要な `s3tables:*` は
-[`later/README.md`](later/README.md) に置いてある。silver を Athena から読み書きするには、
+ワークグループ作成の権限が要る。S3 Tables 側には `s3tables:*`(テーブルバケット・名前空間・テーブルの
+作成と読み書き)が要る。silver を Athena から読み書きするには、
 IAM に加えて Lake Formation の権限が要る(`grant_lakeformation.sh`)。
 
 ## プロバイダの書き方でハマった点

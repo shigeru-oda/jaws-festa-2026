@@ -22,5 +22,5 @@ notebooks/opendata_report/
 .DS_Store
 terraform/.prof.local
 
-# 作業ディレクトリ(make clean で消える)
+# 作業ディレクトリ(ノートブックの手元実行で使う)
 work/
