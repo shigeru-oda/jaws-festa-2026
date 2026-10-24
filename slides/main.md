@@ -185,8 +185,7 @@ p { margin: 10px 0 0; }
 方針
 
 - Bronze の String に型を付けること（人数の列は long）
-- 数値にならない`-`は NULL にすること（0 にはしない）
-- マイナスの値は推計値としてそのまま残し、件数を記録すること
+- NULL または マイナスの値は推計値としてそのまま残し、件数を記録すること
 - 可視化でのチェックを行うこと
 
 チェック内容
@@ -198,6 +197,116 @@ p { margin: 10px 0 0; }
 - 総数の推移を可視化
 - 数値カラムごとのNULLとマイナスを可視化
 - 年 × 各歳のヒートマップ可視化
+
+---
+
+## データセットのチェックの仕方（Amazon SageMaker Unified Studio）
+
+<style scoped>
+img { display: block; margin: 0 auto; }
+</style>
+
+- Notebook上でPythonやSQLのコードを作成
+- 手元でAI経由でNotebookを作成
+- Amazon SageMaker Unified Studio上でAI経由でNotebookを作成
+
+![h:300](./image/ai.png)
+
+---
+
+## AIに問い合わせする（Landing層）
+
+<style scoped>
+p, ul { font-size: 24px; line-height: 1.45; margin: 0 0 10px; }
+code { font-size: 19px; }
+</style>
+
+以下S3配下にファイルを置いてありますので、データチェックをお願いします。
+`s3://jaws-festa-2026-378647896848-ap-northeast-1-an/akita/landing/population_by_age/`
+
+**チェック内容**
+
+- 文字コードがUTF-8であるか または 変換可能であること
+- 改行コードはLFであるか または 変換可能であること
+- 構造化データ または 半構造化データでTable変換可能であること
+- "で囲みがないこと(","などのエスケープされたカンマがあることを危惧)
+- 列数がヘッダとデータで差異はないこと
+- 空行がないこと
+
+---
+
+## Landing層Check
+
+<style scoped>
+p { text-align: center; margin: 0; }
+</style>
+
+![h:500](./image/LandingCheck.png)
+
+---
+
+## AIに問い合わせする（Bronze層）
+
+<style scoped>
+p, ul { font-size: 24px; line-height: 1.45; margin: 0 0 10px; }
+code { font-size: 19px; }
+</style>
+
+`データソース名: AwsDataCatalog、データベース名: jaws_festa_2026_akita、テーブル名: bronze_nenreikakusai`に対して以下チェックを実施してください
+
+**チェック内容**
+
+- CSVファイルとTable件数が同じであること
+  - CSVファイルは件数に含めないこと
+  - s3の保存先 `s3://jaws-festa-2026-378647896848-ap-northeast-1-an/akita/landing/population_by_age/`
+- 数値型となる想定の列は数値変換が可能であること
+  - '-'は0として扱うこと
+- 合算の計算があうこと
+- キー重複がないこと
+- 男女計・男・女が1行ずつあるか
+
+---
+
+## Bronze層Check
+
+<style scoped>
+p { text-align: center; margin: 0; }
+</style>
+
+![h:150](./image/BronzeCheck.png)
+
+---
+
+## AIに問い合わせする（Silver層）
+
+<style scoped>
+p, ul { font-size: 24px; line-height: 1.45; margin: 0 0 10px; }
+code { font-size: 19px; }
+</style>
+
+`データソース名: 378647896848:s3tablescatalog/jaws-festa-2026-silver、データベース名: akita、テーブル名: silver_nenreikakusai`
+に対して以下チェックを実施してください
+
+**チェック内容**
+
+- Bronze層と件数が同じであること
+  - `データソース名: AwsDataCatalog、データベース名: jaws_festa_2026_akita、テーブル名: bronze_nenreikakusai`
+- 5歳階級の推移を可視化
+- 人口ピラミッドを可視化
+- '-'とマイナスの分布を可視化
+- 総数の推移を可視化
+- 数値カラムごとのNULLとマイナスを可視化
+- 年 × 各歳のヒートマップ可視化
+
+---
+
+## Silver層Check
+
+<style scoped>
+p { text-align: center; margin: 0; }
+</style>
+
+![](./image/SilverCheck.png)
 
 ---
 
@@ -264,10 +373,11 @@ ul { font-size: 0.62em; line-height: 1.5; margin: 8px 0 0; }
 ---
 
 <style scoped>
-table { font-size: 0.55em; }
-th, td { padding: 4px 8px; text-align: center; white-space: nowrap; }
+table { font-size: 0.62em; }
+th, td { padding: 5px 8px; text-align: center; white-space: nowrap; }
 th:first-child, td:first-child { text-align: left; }
 p { font-size: 0.55em; margin: 6px 0; }
+ul { font-size: 0.62em; line-height: 1.5; margin: 8px 0 0; }
 </style>
 
 ## 【参考】DuckDBの場合
@@ -293,60 +403,61 @@ DuckDB 1.5.6 で実測
 ## Parquet化すれば課題は解決するのでは？
 
 <style scoped>
-table { font-size: 0.66em; }
-th, td { padding: 5px 8px; }
-th:first-child, td:first-child { white-space: nowrap; }
-p { font-size: 0.62em; margin: 10px 0 0; }
+table { font-size: 0.62em; }
+th, td { padding: 5px 8px; text-align: center; white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+p { font-size: 0.55em; margin: 6px 0; }
+ul { font-size: 0.62em; line-height: 1.5; margin: 8px 0 0; }
 </style>
 
-| 変更の種類       | CSV<br>位置で読む | Parquet<br>名前で読む<br>(Athena既定) | Iceberg<br>field ID で読む |
-| ---------------- | ----------------- | ------------------------------------- | -------------------------- |
-| 列の削除         | 値がずれる        | NULL（正しい）                        | NULL（正しい）             |
-| 先頭・中間に追加 | 値がずれる        | 影響なし                              | 影響なし                   |
-| 列の順序変更     | 値がずれる        | 影響なし                              | 影響なし                   |
-| 列の名前変更     | 値は正しい／名前が古いまま | NULL（片方の年が欠ける）      | 影響なし（RENAME した場合） |
-
+| 変更の種類       | CSV<br>位置で読む          | Parquet<br>名前で読む<br>(Athena既定) | Iceberg<br>field ID で読む  |
+| ---------------- | -------------------------- | ------------------------------------- | --------------------------- |
+| 列の削除         | 値がずれる                 | NULL（正しい）                        | NULL（正しい）              |
+| 先頭・中間に追加 | 値がずれる                 | 影響なし                              | 影響なし                    |
+| 列の順序変更     | 値がずれる                 | 影響なし                              | 影響なし                    |
+| 列の名前変更     | 値は正しい／名前が古いまま | NULL（片方の年が欠ける）              | 影響なし（RENAME した場合） |
 
 ---
 
 ## Parquet で足りるか、Iceberg にするか
 
 <style scoped>
-table { font-size: 0.66em; }
-th, td { padding: 6px 8px; }
-th:first-child, td:first-child { white-space: nowrap; }
-p { font-size: 0.62em; margin: 10px 0 0; }
+table { font-size: 0.62em; }
+th, td { padding: 5px 8px; text-align: left; white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+p { font-size: 0.55em; margin: 6px 0; }
+ul { font-size: 0.62em; line-height: 1.5; margin: 8px 0 0; }
 </style>
 
 ファイル形式の話ではなく、テーブルとして持つか否かの話
 
-|                  | S3 に置く（CSV / Parquet）                                       | S3 Tables（Iceberg）                  |
-| ---------------- | ---------------------------------------------------------------- | ------------------------------------- |
-| スキーマの検査   | 読むときに検査。定義とファイルが食い違っても通る場合がある | 書くときに検査。合わないDMLは失敗する |
-| 列が変わった履歴 | 定義の履歴は Glue に残るが、ファイルとの対応は残らない           | スキーマの版が残る（古い snapshot は当時の列で読める） |
-| 書き込み         | 置き換えの途中が見える                                           | アトミックなコミット                  |
-| 過去の数字の再現 | 自分で版を管理                                                   | time travel（snapshot ID で戻れる）   |
-| 遡った訂正       | ファイルを作り直す                                               | UPDATE / DELETE / MERGE INTO    |
-
+|                  | S3 に置く（CSV / Parquet）                                     | S3 Tables（Iceberg）                                       |
+| ---------------- | -------------------------------------------------------------- | ---------------------------------------------------------- |
+| スキーマの検査   | 読むときに検査。<br>定義とファイルが食い違っても通る場合がある | 書くときに検査。<br>合わないDMLは失敗する                  |
+| 列が変わった履歴 | 定義の履歴は Glue に残るが、<br>ファイルとの対応は残らない     | スキーマの版が残る<br>（古い snapshot は当時の列で読める） |
+| 書き込み         | 置き換えの途中が見える                                         | アトミックなコミット                                       |
+| 過去の数字の再現 | 自分で版を管理                                                 | time travel<br>（snapshot ID で戻れる）                    |
+| 遡った訂正       | ファイルを作り直す                                             | UPDATE / DELETE / MERGE INTO                               |
 
 ---
 
 ## 判断の軸はデータ量ではなく、列が変わるかどうか
 
 <style scoped>
-table { font-size: 0.66em; }
-th, td { padding: 6px 8px; }
-th:first-child, td:first-child { white-space: nowrap; }
-p { font-size: 0.62em; margin: 10px 0 0; }
+table { font-size: 0.62em; }
+th, td { padding: 5px 8px; text-align: center; white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+p { font-size: 0.55em; margin: 6px 0; }
+ul { font-size: 0.62em; line-height: 1.5; margin: 8px 0 0; }
 </style>
 
-| 自分のデータが…      | S3 + Athena（CSV） | S3 に Parquet | S3 Tables（Iceberg）     |
-| -------------------- | ------------------ | ------------- | ------------------------ |
-| 列の構成が変わらない | 十分               | 十分          | 過剰                     |
-| 列が増減する         | 値がずれる         | 読める        | 読める                   |
-| 列の名前が変わる     | 値は正しい／名前が古いまま | NULL（片方の年が欠ける） | 影響なし（RENAME した場合） |
-| 過去の版を遡りたい   | 自分で運用         | 自分で運用    | snapshot                 |
-| 書き込みが同時に走る | 途中の状態が見える | 途中の状態が見える | アトミック、途中の状態は見えない |
+| 自分のデータが…      | S3 + Athena（CSV）         | S3 に Parquet            | S3 Tables（Iceberg）             |
+| -------------------- | -------------------------- | ------------------------ | -------------------------------- |
+| 列の構成が変わらない | 十分                       | 十分                     | 過剰                             |
+| 列が増減する         | 値がずれる                 | 読める                   | 読める                           |
+| 列の名前が変わる     | 値は正しい／名前が古いまま | NULL（片方の年が欠ける） | 影響なし（RENAME した場合）      |
+| 過去の版を遡りたい   | 自分で運用                 | 自分で運用               | snapshot                         |
+| 書き込みが同時に走る | 途中の状態が見える         | 途中の状態が見える       | アトミック、途中の状態は見えない |
 
 ---
 

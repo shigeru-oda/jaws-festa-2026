@@ -1,16 +1,9 @@
 # Python-generated files
 __pycache__/
 *.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
 
 # Virtual environments
 .venv
-
-# marimo のセッションキャッシュ
-notebooks/__marimo__/
 
 # data/ 配下の CSV は CKAN から取り直せるのでコミットしない。
 data/**/*.csv

@@ -22,7 +22,10 @@ marp-cli と `tools/build_theme.py` はこのディレクトリを基準に動�
 ```bash
 cd slides
 npx @marp-team/marp-cli --pdf --allow-local-files -o out/main.pdf main.md
+npx @marp-team/marp-cli --pptx --allow-local-files -o out/main.pptx main.md
 ```
+
+`--pptx` は各ページを画像として貼るので、PowerPoint 上で文字は編集できない。
 
 ## テーマを直す
 

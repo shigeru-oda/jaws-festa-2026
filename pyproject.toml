@@ -3,7 +3,7 @@ name = "akita-iceberg-demo"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.15"
 # 計測は AWS 上の Athena で行う。手元のスクリプト(scripts/*.py)は
 # 標準ライブラリだけで動くので、サードパーティ依存は無い。
 # ローカルで計測していた頃の依存(duckdb / polars / pyarrow / pyiceberg /
