@@ -222,7 +222,7 @@ code { font-size: 19px; }
 </style>
 
 以下S3配下にファイルを置いてありますので、データチェックをお願いします。
-`s3://jaws-festa-2026-378647896848-ap-northeast-1-an/akita/landing/population_by_age/`
+`s3://jaws-festa-2026-123456789012-ap-northeast-1-an/akita/landing/population_by_age/`
 
 **チェック内容**
 
@@ -258,7 +258,7 @@ code { font-size: 19px; }
 
 - CSVファイルとTable件数が同じであること
   - CSVファイルは件数に含めないこと
-  - s3の保存先 `s3://jaws-festa-2026-378647896848-ap-northeast-1-an/akita/landing/population_by_age/`
+  - s3の保存先 `s3://jaws-festa-2026-123456789012-ap-northeast-1-an/akita/landing/population_by_age/`
 - 数値型となる想定の列は数値変換が可能であること
   - '-'は0として扱うこと
 - 合算の計算があうこと
@@ -284,7 +284,7 @@ p, ul { font-size: 24px; line-height: 1.45; margin: 0 0 10px; }
 code { font-size: 19px; }
 </style>
 
-`データソース名: 378647896848:s3tablescatalog/jaws-festa-2026-silver、データベース名: akita、テーブル名: silver_nenreikakusai`
+`データソース名: 123456789012:s3tablescatalog/jaws-festa-2026-silver、データベース名: akita、テーブル名: silver_nenreikakusai`
 に対して以下チェックを実施してください
 
 **チェック内容**
