@@ -74,6 +74,12 @@ p { font-size: 0.70em; margin: 8px 0 0; }
 
 ---
 
+## 数字で見る秋田 ― オープンデータでたどる人と暮らし
+
+https://doxu2ee6l5ui3.cloudfront.net/jaws-festa-2026/index.html
+
+---
+
 ## データセットのチェックの仕方
 
 <style scoped>
