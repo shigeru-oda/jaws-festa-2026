@@ -23,9 +23,9 @@ paginate: true
 ### Shigeru Oda
 
 - Community
-  - AWS Community Hero
-  - JAWS-UG ビッグデータ支部 運営
-  - JAWS-UG 初心者支部 運営
+  - AWS Community Hero（2022年06月〜）
+  - JAWS-UG 初心者支部 運営（2020年01月〜）
+  - JAWS-UG ビッグデータ支部 運営（2026年05月〜）
 
 - Sansan株式会社 技術本部
   - Sansan Engineering Unit Infrastructure Group
@@ -36,13 +36,12 @@ paginate: true
 
 ---
 
-## 秋田県オープンデータカタログサイト
-
 <style scoped>
+section { padding-top: 30px; padding-bottom: 30px; }
 p { text-align: center; margin: 0; }
 </style>
 
-![h:560](./image/opendata.png)
+![w:1192](./image/opendata.png)
 
 <!--
 -->
@@ -69,8 +68,19 @@ p { font-size: 0.70em; margin: 8px 0 0; }
 | エネルギー・水／国土・気象 |  21 | 風力・地熱・メガソーラー、指定避難所、津波想定   |
 | ほか9分野 ＋ 分野なし      |  66 | 工業団地情報、クマダス（クマ目撃）、在住外国人数 |
 
+※2分野に属する2件は両方の分野に数えているため、件数の合計は266になる
+
 <!--
 -->
+
+---
+
+<style scoped>
+section { padding-top: 30px; padding-bottom: 30px; }
+p { text-align: center; margin: 0; }
+</style>
+
+![h:600](./image/kumadasu.png)
 
 ---
 
@@ -105,21 +115,21 @@ table { font-size: 0.8em; margin-top: 14px; }
 <style scoped>
 p { margin: 0; }
 table { font-size: 0.75em; margin-top: 14px; }
-td:nth-child(2) { text-align: right; }
+td:not(:first-child) { text-align: right; }
 </style>
 
-`pref_nenreikakusai_2020.csv` の1行（2025年・秋田県・男女計）
+`pref_nenreikakusai_2020.csv` の3行（2025年・秋田県・男女別）
 
-| カラム          |                値 |
-| --------------- | ----------------: |
-| 年月日コード    |        2025001001 |
-| 年月日          | 2025年10月1日現在 |
-| 市町村コード    |              5000 |
-| 市町村          |            秋田県 |
-| 男女別          |      男女計（人） |
-| 総数            |           878,798 |
-| 0歳(1歳刻み)    |             3,068 |
-| 0～4歳(5歳刻み) |            18,782 |
+| カラム          |            男女計 |                男 |                女 |
+| --------------- | ----------------: | ----------------: | ----------------: |
+| 年月日コード    |        2025001001 |        2025001001 |        2025001001 |
+| 年月日          | 2025年10月1日現在 | 2025年10月1日現在 | 2025年10月1日現在 |
+| 市町村コード    |              5000 |              5000 |              5000 |
+| 市町村          |            秋田県 |            秋田県 |            秋田県 |
+| 男女別          |      男女計（人） |          男（人） |          女（人） |
+| 総数            |           878,798 |           415,821 |           462,977 |
+| 0歳(1歳刻み)    |             3,068 |             1,564 |             1,504 |
+| 0～4歳(5歳刻み) |            18,782 |             9,642 |             9,140 |
 
 ---
 
@@ -183,9 +193,8 @@ li { break-inside: avoid; }
 ## データセットのチェックの仕方 Silver層
 
 <style scoped>
-ul { column-count: 1; font-size: 0.68em; line-height: 1.45; margin-top: 6px; }
+ul { column-count: 1; column-gap: 28px; font-size: 0.8em; line-height: 1.35; margin-top: 6px; }
 li { break-inside: avoid; }
-p { margin: 10px 0 0; }
 </style>
 
 方針
@@ -213,8 +222,8 @@ img { display: block; margin: 0 auto; }
 </style>
 
 - Notebook上でPythonやSQLのコードを作成
-- 手元でAI経由でNotebookを作成
-- Amazon SageMaker Unified Studio上でAI経由でNotebookを作成
+- LocalでNotebookを作成してImportでもヨシ
+- Amazon SageMaker Unified Studio上でAIに相談しながら作成でもヨシ
 
 ![h:300](./image/ai.png)
 
@@ -223,8 +232,8 @@ img { display: block; margin: 0 auto; }
 ## AIに問い合わせする（Landing層）
 
 <style scoped>
-p, ul { font-size: 24px; line-height: 1.45; margin: 0 0 10px; }
-code { font-size: 19px; }
+ul { column-count: 1; column-gap: 28px; font-size: 0.8em; line-height: 1.6; margin-top: 10px; }
+li { break-inside: avoid; }
 </style>
 
 以下S3配下にファイルを置いてありますので、データチェックをお願いします。
@@ -241,21 +250,20 @@ code { font-size: 19px; }
 
 ---
 
-## Landing層Check
-
 <style scoped>
+section { padding-top: 30px; padding-bottom: 30px; }
 p { text-align: center; margin: 0; }
 </style>
 
-![h:500](./image/LandingCheck.png)
+![h:600](./image/LandingCheck.png)
 
 ---
 
 ## AIに問い合わせする（Bronze層）
 
 <style scoped>
-p, ul { font-size: 24px; line-height: 1.45; margin: 0 0 10px; }
-code { font-size: 19px; }
+ul { column-count: 1; column-gap: 28px; font-size: 0.8em; line-height: 1.6; margin-top: 10px; }
+li { break-inside: avoid; }
 </style>
 
 `データソース名: AwsDataCatalog、データベース名: jaws_festa_2026_akita、テーブル名: bronze_nenreikakusai`に対して以下チェックを実施してください
@@ -263,10 +271,7 @@ code { font-size: 19px; }
 **チェック内容**
 
 - CSVファイルとTable件数が同じであること
-  - CSVファイルは件数に含めないこと
-  - s3の保存先 `s3://jaws-festa-2026-123456789012-ap-northeast-1-an/akita/landing/population_by_age/`
 - 数値型となる想定の列は数値変換が可能であること
-  - '-'は0として扱うこと
 - 合算の計算があうこと
 - キー重複がないこと
 - 男女計・男・女が1行ずつあるか
@@ -286,8 +291,8 @@ p { text-align: center; margin: 0; }
 ## AIに問い合わせする（Silver層）
 
 <style scoped>
-p, ul { font-size: 24px; line-height: 1.45; margin: 0 0 10px; }
-code { font-size: 19px; }
+ul { column-count: 1; column-gap: 28px; font-size: 0.8em; line-height: 1.6; margin-top: 10px; }
+li { break-inside: avoid; }
 </style>
 
 `データソース名: 123456789012:s3tablescatalog/jaws-festa-2026-silver、データベース名: akita、テーブル名: silver_nenreikakusai`
@@ -296,7 +301,6 @@ code { font-size: 19px; }
 **チェック内容**
 
 - Bronze層と件数が同じであること
-  - `データソース名: AwsDataCatalog、データベース名: jaws_festa_2026_akita、テーブル名: bronze_nenreikakusai`
 - 5歳階級の推移を可視化
 - 人口ピラミッドを可視化
 - '-'とマイナスの分布を可視化
@@ -406,77 +410,91 @@ DuckDB 1.5.6 で実測
 
 ---
 
-## Parquet化すれば課題は解決するのでは？
+## Parquet化で列の増減は解決する。列名の変更は解決しない
 
 <style scoped>
 table { font-size: 0.62em; }
 th, td { padding: 5px 8px; text-align: center; white-space: nowrap; }
 th:first-child, td:first-child { text-align: left; }
-p { font-size: 0.55em; margin: 6px 0; }
+p { font-size: 0.75em; margin: 6px 0 14px; }
 ul { font-size: 0.62em; line-height: 1.5; margin: 8px 0 0; }
 </style>
 
+Parquet は列を名前で読むので、今回の「年齢不詳」列の消失によるズレは起きない。
+ただし列名が年によって違うと、別の列として扱われ、片方の年が NULL になる。
+
 | 変更の種類       | CSV<br>位置で読む          | Parquet<br>名前で読む<br>(Athena既定) | Iceberg<br>field ID で読む  |
 | ---------------- | -------------------------- | ------------------------------------- | --------------------------- |
-| 列の削除         | 値がずれる                 | NULL（正しい）                        | NULL（正しい）              |
-| 先頭・中間に追加 | 値がずれる                 | 影響なし                              | 影響なし                    |
-| 列の順序変更     | 値がずれる                 | 影響なし                              | 影響なし                    |
-| 列の名前変更     | 値は正しい／名前が古いまま | NULL（片方の年が欠ける）              | 影響なし（RENAME した場合） |
+| 列の削除         | 値がずれる                 | 無い年だけ NULL                     |  無い年だけ NULL           |
+| 先頭・中間に追加 | 値がずれる                 | 影響なし                            |  影響なし                  |
+| 列の順序変更     | 値がずれる                 | 影響なし                            |  影響なし                  |
+| 列の名前変更 | 値は正しい／名前が古いまま | 旧名の年が NULL          |  影響なし |
 
 ---
 
-## Parquet で足りるか、Iceberg にするか
+## Iceberg はスキーマの変化をテーブル側で管理する
 
 <style scoped>
 table { font-size: 0.62em; }
 th, td { padding: 5px 8px; text-align: left; white-space: nowrap; }
 th:first-child, td:first-child { text-align: left; }
-p { font-size: 0.55em; margin: 6px 0; }
+p { font-size: 0.75em; margin: 6px 0 14px; }
 ul { font-size: 0.62em; line-height: 1.5; margin: 8px 0 0; }
 </style>
 
-ファイル形式の話ではなく、テーブルとして持つか否かの話
+Parquet は「ファイルに列名を持つ」だけで、列の変化を管理する仕組みは持たない。
+Iceberg は列の変化をテーブルの履歴として記録するので、名前変更にも過去の再現にも対応できる。
 
-|                  | S3 に置く（CSV / Parquet）                                     | S3 Tables（Iceberg）                                       |
-| ---------------- | -------------------------------------------------------------- | ---------------------------------------------------------- |
-| スキーマの検査   | 読むときに検査。<br>定義とファイルが食い違っても通る場合がある | 書くときに検査。<br>合わないDMLは失敗する                  |
-| 列が変わった履歴 | 定義の履歴は Glue に残るが、<br>ファイルとの対応は残らない     | スキーマの版が残る<br>（古い snapshot は当時の列で読める） |
-| 書き込み         | 置き換えの途中が見える                                         | アトミックなコミット                                       |
-| 過去の数字の再現 | 自分で版を管理                                                 | time travel<br>（snapshot ID で戻れる）                    |
-| 遡った訂正       | ファイルを作り直す                                             | UPDATE / DELETE / MERGE INTO                               |
+|                    | S3 に置く（CSV / Parquet）                                         | S3 Tables（Iceberg）                                            |
+| ------------------ | ------------------------------------------------------------------ | --------------------------------------------------------------- |
+| 列名の変更     | 別の列として扱われ、旧名の年が NULL                              | 列を ID で追うので、RENAME しても全年読める                   |
+| スキーマの検査     | 読むときに検査。<br>定義とファイルが食い違っても通ることがある   | 書くときに検査。<br>合わない書き込みは失敗する                |
+| 列が変わった履歴   | 定義の履歴は Glue に残るが、<br>どのファイルがどの版かは残らない | スキーマの版が残る<br>（古い snapshot は当時の列で読める）    |
+| 過去の数字の再現   | 自分で版を管理                                                   | time travel（snapshot ID で戻れる）                           |
+| 書き込み中の読み取り | 置き換えの途中が見える                                           | アトミックなコミット。途中の状態は見えない                    |
+| 遡った訂正         | ファイルを作り直す                                               | UPDATE / DELETE / MERGE INTO                                  |
 
 ---
 
-## 判断の軸はデータ量ではなく、列が変わるかどうか
+## 選ぶ基準はデータ量ではなく、列が変わるかどうか
 
 <style scoped>
 table { font-size: 0.62em; }
 th, td { padding: 5px 8px; text-align: center; white-space: nowrap; }
 th:first-child, td:first-child { text-align: left; }
-p { font-size: 0.55em; margin: 6px 0; }
+p { font-size: 0.75em; margin: 6px 0 14px; }
 ul { font-size: 0.62em; line-height: 1.5; margin: 8px 0 0; }
 </style>
 
-| 自分のデータが…      | S3 + Athena（CSV）         | S3 に Parquet            | S3 Tables（Iceberg）             |
-| -------------------- | -------------------------- | ------------------------ | -------------------------------- |
-| 列の構成が変わらない | 十分                       | 十分                     | 過剰                             |
-| 列が増減する         | 値がずれる                 | 読める                   | 読める                           |
-| 列の名前が変わる     | 値は正しい／名前が古いまま | NULL（片方の年が欠ける） | 影響なし（RENAME した場合）      |
-| 過去の版を遡りたい   | 自分で運用                 | 自分で運用               | snapshot                         |
-| 書き込みが同時に走る | 途中の状態が見える         | 途中の状態が見える       | アトミック、途中の状態は見えない |
+列が変わらないなら CSV で十分。列が増減するなら Parquet。
+列名が変わる、または過去の数字を再現したいなら Iceberg。
+
+| 自分のデータが…        | S3 + Athena（CSV）             | S3 に Parquet              | S3 Tables（Iceberg）            |
+| ---------------------- | ------------------------------ | -------------------------- | ------------------------------- |
+| 列の構成が変わらない   | 十分                         | 十分                     | 過剰                          |
+| 列が増減する           | 値がずれる                   | 読める                   | 読める                        |
+| 列の名前が変わる       | 値は正しい／名前が古いまま   | 旧名の年が NULL になる   | 影響なし   |
+| 過去の版を遡りたい     | 自分で運用                   | 自分で運用               | snapshot で戻れる             |
+| 書き込みが同時に走る   | 途中の状態が見える           | 途中の状態が見える       | アトミック。途中の状態は見えない |
 
 ---
 
 ## まとめ
 
 <style scoped>
-ul { font-size: 0.86em; line-height: 1.7; margin-top: 16px; }
+ul { font-size: calc(var(--festa-body-size) * 0.82); line-height: 1.6; margin-top: 12px; }
+ul ul { font-size: calc(var(--festa-body-size) * 0.82); margin-top: 0; }
+li { margin-bottom: 6px; }
 p { font-size: 0.86em; margin: 18px 0 0; }
 </style>
 
-- スキーマが変わるデータを CSV で置くと、エラーを出さずに間違った数字を返す
-- 件数も合計も合うので、素朴なデータ品質チェックはすり抜ける
-- IcebergなどTableデータとして格納する前提でチェックフローを組むことで、データ品質を確保することができる。
+- CSV を置くだけの構成は、壊れずに間違う
+  - 2020年から「年齢不詳」列が消え、95〜99歳の値がずれて NULL になった。エラーは出なかった
+- 件数・合計・キー重複のチェックでは見つからない
+  - Bronze 層のチェックはすべて通った。Silver 層で年ごとに可視化して初めて見つかった
+- 列が変わるデータは、列名で読める形式で持つ
+  - 列が増減するなら Parquet。列名が変わる、過去の数字を再現したいなら Iceberg（S3 Tables）
+- 変更される可能性がある大量データをチェックするなら、AIによる機械的なチェックと人による可視化チェックは必要
 
 ---
 
